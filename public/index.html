@@ -2,82 +2,52 @@
 <html lang="es-AR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#141210">
-  <meta name="description" content="Una noche. Seis intentos. Un patova difícil de convencer. Entrá a Caramelo, un pequeño juego ASCII con Jev.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#0c0c0b">
+  <meta name="description" content="No estás en la lista. Tenés seis intentos para convencer al patova de Caramelo. Un juego de chamuyo con Jev.">
   <title>Caramelo — ¿Estás en la lista?</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23141210'/%3E%3Ctext x='15' y='48' font-size='48' fill='%23e9b879'%3Ec%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230c0c0b'/%3E%3Ctext x='15' y='48' font-size='48' fill='%23e9b879'%3Ec%3C/text%3E%3C/svg%3E">
+  <link rel="preload" href="/assets/caramelo-door.png" as="image" fetchpriority="high">
   <link rel="stylesheet" href="/style.css">
   <script type="module" src="/app.js"></script>
 </head>
 <body>
-  <header class="topbar"><a href="/" class="wordmark">caramelo<span>®</span></a><span class="edition">UN PEQUEÑO JUEGO DE CHAMUYO</span><button id="sound" class="quiet" aria-pressed="false">♪ SONIDO OFF</button></header>
-  <main>
-    <section class="intro"><div><p class="eyebrow">BUENOS AIRES · 02:47 AM</p><h1>La noche promete.<br><em>El patova, no.</em></h1></div><p class="premise">El boliche del que todos hablan.<br>Vos no estás en la lista.<br>Convencelo de que haga una excepción.</p></section>
-    <section class="game" aria-label="Entrada al boliche Caramelo">
-      <div class="scene-top"><span><i class="light"></i> EN LA PUERTA</span><span id="night-label">SÁBADO, UN POCO TARDE</span><span>BA · AR</span></div>
-      <div class="scene" id="scene" role="group" aria-label="Fachada art déco del boliche Caramelo, con luces rosa, un patova enorme de brazos cruzados y vos, mucho más bajito, esperando frente a la soga.">
-        <div class="stars" aria-hidden="true">·　　　　　+　　　　　　　　　　　　　　　　·　　　　　　　　　　　+<br>　　　　　　　　·　　　　　　　　　　+　　　　　　　　　　　·</div>
-        <div class="facade" aria-hidden="true"><pre class="roof">                      .                                        .
-          ___________/|________________________________________|\___________
-         /____________|________________________________________|____________\</pre><div class="sign"><span class="sign-star">✧</span><div><strong>CARAMELO</strong><small>THE SWEET SIDE OF THE NIGHT</small></div><span class="sign-star">✧</span></div><pre class="architecture">       ╔══════╤════════════╤════════════════════╤════════════╤══════╗
-       ║ ░░░░ │  ╱╲  ╱╲   │ ┌────────────────┐ │   ╱╲  ╱╲  │ ░░░░ ║
-       ║ ░░░░ │ ╱  ╲╱  ╲  │ │  ░ ░ ░ ░ ░ ░   │ │  ╱  ╲╱  ╲ │ ░░░░ ║
-       ║ ░░░░ │ │  ││  │  │ │ ░ ░ ░ ░ ░ ░ ░  │ │  │  ││  │ │ ░░░░ ║
-       ║ ░░░░ │ │  ││  │  │ │  ░ ░ ░ ░ ░ ░   │ │  │  ││  │ │ ░░░░ ║
-       ║ ░░░░ │ │  ││  │  │ │ ░ ░ ░ ░ ░ ░ ░  │ │  │  ││  │ │ ░░░░ ║
-       ║ ░░░░ │ │  ││  │  │ │  ░ ░ ░ ░ ░ ░   │ │  │  ││  │ │ ░░░░ ║
-       ║ ░░░░ │ └──┘└──┘  │ │ ░ ░ ░ ░ ░ ░ ░  │ │  └──┘└──┘ │ ░░░░ ║
-       ╚══════╧════════════╧═╧════════════════╧═╧════════════╧══════╝</pre></div>
-        <div class="door-glow" aria-hidden="true"></div>
-        <div class="speech" id="speech" aria-hidden="true">¿Estás en la lista?</div>
-        <div class="actor guard" aria-hidden="true"><pre id="guard-art">        .───────.
-       /█████████\
-       │ ▬   ▬ │
-       │   ▄   │
-       ╰┬─────┬╯
-    .───┤ ▽▽  ├───.
-   /███████████████\
-  /███╱█████████╲███\
-  │██╱___________╲██│
-  │██╲___________╱██│
-   ╲███████████████╱
-    │█████████████│
-    └────┬───┬────┘
-     │███│   │███│
-     │███│   │███│
-    ▄████│   │████▄</pre><span class="actor-label">EL PATOVA</span></div>
-        <div class="actor player" aria-hidden="true"><pre>    ▄▄▄▄
-   /· · \
-   \ ︶ /
-   ╭┴──┴╮
-  /│░░░░│\
-   │░░░░│
-   └┬──┬┘
-    │  │
-   ▄│  │▄</pre><span class="actor-label">VOS ↑</span></div>
-        <pre class="rope" aria-hidden="true">◉╲________________________________________╱◉
-│                                          │
-│                                          │
-┴                                          ┴</pre>
-        <pre class="plant plant-left" aria-hidden="true">    \│/
-  \\ │ //
-   \\│//
-  \\ │ //
-   ╔═══╗
-   ╚═══╝</pre><pre class="plant plant-right" aria-hidden="true">    \│/
-  \\ │ //
-   \\│//
-  \\ │ //
-   ╔═══╗
-   ╚═══╝</pre>
-        <div class="ground" aria-hidden="true"></div><span class="scene-caption">NO ES PERSONAL. ES LA LISTA.</span>
-        <div id="ending" class="ending" hidden><p id="ending-kicker"></p><h2 id="ending-title"></h2><p id="ending-copy"></p><button id="again">OTRA NOCHE ↗</button></div>
+  <main class="cabinet">
+    <h1 class="sr-only">Caramelo. Convencé al patova.</h1>
+    <header class="topbar">
+      <span><i class="light" aria-hidden="true"></i> BUENOS AIRES <span class="time">/ 02:47 AM</span></span>
+      <button id="sound" class="quiet" aria-label="Activar sonido" aria-pressed="false">♪ SONIDO OFF</button>
+    </header>
+    <section class="game" aria-label="Convencé al patova para entrar a Caramelo">
+      <div class="scene" id="scene" role="group" aria-label="En la puerta de Caramelo">
+        <img class="scene-art" src="/assets/caramelo-door.png" alt="Arte ASCII detallado: vos, a la izquierda, mirás hacia arriba al enorme patova de brazos cruzados. Detrás brilla el cartel de Caramelo." fetchpriority="high" decoding="async" width="1086" height="1448">
+        <div class="scene-caption" aria-hidden="true"><span>VOS ↗</span><span>EL PATOVA ↗</span></div>
+        <div id="ending" class="ending" hidden>
+          <p id="ending-kicker"></p>
+          <h2 id="ending-title"></h2>
+          <p id="ending-copy"></p>
+          <button id="again" class="primary">OTRA NOCHE ↗</button>
+        </div>
       </div>
-      <div class="statusbar"><span id="mood">◈ Cara de póker</span><div class="trust"><label for="trust">BUENA ONDA</label><meter id="trust" min="0" max="100" value="12">12 de 100</meter></div><span id="turns">INTENTOS 0 / 6</span></div>
+      <div class="console">
+        <div class="statusbar"><span id="mood">◈ Cara de póker</span><span id="turns">INTENTOS 0 / 6</span></div>
+        <div class="trust"><label for="trust" class="sr-only">Buena onda del patova</label><meter id="trust" min="0" max="100" value="12">12 de 100</meter></div>
+        <div class="dialogue"><span class="speaker">EL PATOVA</span><p id="guard-line" aria-live="polite">Buenas. Lista cerrada, casa llena. Dame una buena razón para abrir esa soga.</p></div>
+        <form id="form">
+          <label class="sr-only" for="message">¿Qué le decís al patova?</label>
+          <div class="input-wrap">
+            <span class="prompt" aria-hidden="true">&gt;</span>
+            <textarea id="message" rows="2" maxlength="280" autocomplete="off" enterkeyhint="send" placeholder="Tirá tu mejor chamuyo…" required disabled aria-describedby="hint"></textarea>
+            <button id="send" class="primary" type="submit" aria-label="Enviar mensaje al patova" disabled><span class="send-label">DECÍSELO</span><span class="send-arrow" aria-hidden="true">↗</span></button>
+          </div>
+          <div class="input-foot"><span id="hint">No estás en la lista. Hacelo cambiar de opinión.</span><span id="count">0 / 280</span></div>
+        </form>
+        <p id="error" role="alert" hidden></p>
+        <button id="retry" class="quiet" hidden>REINTENTAR CONEXIÓN ↗</button>
+        <details id="history"><summary>LO QUE DIJISTE <span aria-hidden="true">+</span></summary><ol id="messages"></ol></details>
+      </div>
     </section>
-    <section class="conversation" aria-label="Hablá con el patova"><div class="dialogue"><span class="speaker">EL PATOVA <span>↘</span></span><p id="guard-line" aria-live="polite">Buenas. Lista cerrada, casa llena. Dame una buena razón para abrir esa soga.</p></div><form id="form"><label class="sr-only" for="message">Tu mensaje al patova</label><div class="input-wrap"><span class="prompt" aria-hidden="true">&gt;</span><input id="message" maxlength="280" autocomplete="off" placeholder="Dale, tirá tu mejor chamuyo…" required disabled><button id="send" type="submit" disabled>CONVENCERLO <span>↵</span></button></div><div class="input-foot"><span id="hint">Seis intentos. Un poco de ingenio. Nada de contactos.</span><span id="count">0 / 280</span></div></form><p id="error" role="alert" hidden></p><button id="retry" class="quiet" hidden>REINTENTAR CONEXIÓN ↗</button><details id="history"><summary>LO QUE DIJISTE EN LA PUERTA <span>+</span></summary><ol id="messages"></ol></details></section>
-    <footer><span>HECHO DE CARACTERES Y MALAS EXCUSAS.</span><span>Decisiones por <a href="https://typesafe.ai" target="_blank" rel="noreferrer">Jev ↗</a><span class="footer-dot">·</span><a href="https://github.com/ariasnico/jevtest" target="_blank" rel="noreferrer">GitHub ↗</a></span></footer>
+    <footer><span>UN JUEGO DE CHAMUYO.</span><span><a href="https://typesafe.ai" target="_blank" rel="noreferrer">Jev ↗</a><span class="footer-dot">·</span><a href="https://github.com/ariasnico/jevtest" target="_blank" rel="noreferrer">GitHub ↗</a></span></footer>
   </main>
 </body>
 </html>

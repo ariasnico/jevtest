@@ -31,7 +31,16 @@ selecciona una frase escrita de antemano y decide si entrás.
 El medidor muestra puntos del juego, **no probabilidades del modelo**. Arrancás
 con 12 y necesitás 80 en seis intentos. La agresión termina la partida.
 No hay otro modelo generando diálogo ni simulación oculta cuando falla la API.
-La escena está dibujada con texto y CSS; no necesita imágenes ni una clave de OpenAI.
+La escena es una imagen de alta densidad visual ASCII, generada con GPT Image
+a partir de un sketch del usuario. El juego usa el archivo incluido en el repo;
+no necesita una clave de OpenAI para jugar. El [prompt del arte](docs/art-direction.md)
+documenta cómo se generó.
+
+La interfaz está pensada primero para celular: escena vertical, personajes en
+primer plano, controles táctiles y cuadro de texto de 16 px para evitar el zoom
+automático de iOS. Enter envía; Shift+Enter agrega una línea en escritorio.
+La dirección `localhost` se abre en la máquina que ejecuta el servidor: para
+acceder desde un teléfono físico hace falta configurar acceso de red o alojamiento.
 
 Los mensajes y el historial de la partida se envían a TypeSafe para su evaluación.
 No escribas información privada. El servidor guarda las partidas en memoria

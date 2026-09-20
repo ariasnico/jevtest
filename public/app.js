@@ -21,7 +21,8 @@ function blip(won = false) {
 }
 function controls() {
   const disabled = busy || !game || game.status !== 'playing';
-  $('#message').disabled = disabled;
+  // Keep the mobile keyboard open while a turn is in flight.
+  $('#message').disabled = !game || game.status !== 'playing';
   $('#send').disabled = disabled;
   $('#again').disabled = busy;
   $('#form').setAttribute('aria-busy', String(busy));
@@ -32,7 +33,6 @@ function render() {
   $('#trust').value = game.score;
   $('#trust').textContent = `${game.score} de 100`;
   $('#turns').textContent = `INTENTOS ${game.turns} / ${game.maxTurns}`;
-  $('#speech').textContent = game.status === 'won' ? 'Pasá, estás en la lista.' : game.status === 'lost' ? 'Hoy no, maestro.' : game.turns === 0 ? '¿Estás en la lista?' : game.mood;
   $('#scene').classList.toggle('won', game.status === 'won');
   $('#ending').hidden = game.status === 'playing';
   if (game.status !== 'playing') {
@@ -68,7 +68,7 @@ async function start() {
     $('#messages').replaceChildren();
     $('#message').value = '';
     $('#count').textContent = '0 / 280';
-    $('#hint').textContent = 'Seis intentos. Un poco de ingenio. Nada de contactos.';
+    $('#hint').textContent = 'No estás en la lista. Hacelo cambiar de opinión.';
     $('#history').open = false;
     busy = false;
     render();
@@ -96,17 +96,25 @@ $('#form').addEventListener('submit', async event => {
     game = await request('/api/talk', { message });
     historyEntry('VOS', message);
     historyEntry('EL PATOVA', game.line);
-    $('#message').value = '';
-    $('#count').textContent = '0 / 280';
+    if ($('#message').value.trim() === message) {
+      $('#message').value = '';
+      $('#count').textContent = '0 / 280';
+    }
     blip(game.status === 'won');
   } catch (error) { showError(error); }
   finally {
     busy = false;
     render();
-    if (game.status === 'playing') $('#message').focus();
+    if (game.status === 'playing' && matchMedia('(pointer: fine)').matches) $('#message').focus();
   }
 });
 $('#message').addEventListener('input', event => { $('#count').textContent = `${event.target.value.length} / 280`; });
+$('#message').addEventListener('keydown', event => {
+  if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+    event.preventDefault();
+    if (!busy) $('#form').requestSubmit();
+  }
+});
 $('#again').addEventListener('click', start);
 $('#retry').addEventListener('click', start);
 $('#sound').addEventListener('click', async () => {
@@ -115,6 +123,7 @@ $('#sound').addEventListener('click', async () => {
     await audio.resume();
     sound = !sound;
     $('#sound').setAttribute('aria-pressed', String(sound));
+    $('#sound').setAttribute('aria-label', sound ? 'Desactivar sonido' : 'Activar sonido');
     $('#sound').textContent = sound ? '♪ SONIDO ON' : '♪ SONIDO OFF';
     blip();
   } catch { $('#sound').textContent = 'SONIDO NO DISPONIBLE'; }
