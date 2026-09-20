@@ -11,6 +11,7 @@ secrets/
 .secrets/
 
 # Dependencies and build artifacts
+.worktrees/
 node_modules/
 dist/
 build/
