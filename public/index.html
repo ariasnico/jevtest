@@ -38,7 +38,24 @@
           <p id="ending-kicker"></p>
           <h2 id="ending-title"></h2>
           <p id="ending-copy"></p>
+          <button id="enter" class="primary" hidden>Entrar</button>
           <button id="again" class="primary">OTRA NOCHE ↗</button>
+        </div>
+        <div id="cinematic" class="cinematic" hidden>
+          <img id="ending-art" class="ending-art" alt="" width="1086" height="1448" hidden>
+          <div id="invitation" class="bubble bubble-invitation" hidden>
+            <span class="speaker">LA NOCHE RECIÉN EMPIEZA</span>
+            <p role="status">Vení, tenemos lugar en la mesa. Después te sacamos a bailar.</p>
+          </div>
+          <div class="cinematic-bottom">
+            <p id="cinematic-caption" role="status"></p>
+            <div id="cinematic-outcome" hidden><h2>De la vereda a la pista.</h2><p>Entraste con puro chamuyo.</p></div>
+            <div class="cinematic-actions">
+              <button id="ending-pause" class="quiet" aria-pressed="false" hidden>Pausar</button>
+              <button id="ending-skip" class="quiet" hidden>Saltar</button>
+              <button id="ending-restart" class="primary">Otra noche ↗</button>
+            </div>
+          </div>
         </div>
       <div class="console">
         <div class="statusbar"><span id="mood">◈ Cara de póker</span><span id="turns">INTENTOS 0 / 6</span></div>

@@ -55,6 +55,16 @@ El botón de pausa congela el cuadro. Se detiene fuera de pantalla, en pestañas
 ocultas y al terminar la partida. Con movimiento reducido o sin WebGL se muestra
 la imagen estática; el juego sigue funcionando.
 
+Al ganar, la última respuesta queda visible y aparece **Entrar**. El final recorre
+la puerta, la soga y el interior del boliche, donde dos invitadas adultas te invitan
+a su mesa y a bailar. Son seis ilustraciones ASCII de GPT Image en un montaje de
+ocho segundos, con reloj y movimiento de cámara a 6 FPS: no una animación de
+personajes fluida. Podés pausar, saltar o empezar otra noche. La pestaña oculta y
+salir de pantalla pausan el reloj; movimiento reducido muestra el final estático.
+Los recursos se precargan al ganar (menos de 5 MB), sin llamadas a modelos durante
+el final. Si una imagen falla, se conserva la victoria y el reinicio.
+Los [prompts exactos y archivos del final](docs/art-ending.md) quedan documentados.
+
 La interfaz está pensada primero para celular: escena vertical, personajes en
 primer plano, controles táctiles y cuadro de texto dentro de la ilustración.
 Al enviar, tu mensaje aparece en una burbuja negra junto al personaje y la
@@ -77,6 +87,22 @@ durante una hora; no persiste conversaciones ni registra su contenido.
 ```sh
 npm test
 ```
+
+Pruebas de navegador del final, sin consumir APIs:
+
+```sh
+npm ci
+npx playwright install chromium
+npm run test:e2e
+# Alternativa con Chrome instalado:
+# CHROME_PATH=/usr/bin/google-chrome npm run test:e2e
+```
+
+El servidor de pruebas usa el puerto 3041 y credenciales ficticias; los resultados
+de las partidas están simulados. Esto no sustituye probar en un teléfono físico.
+
+Para entender el contrato real de Jev y las reglas, consultá
+[cómo decide el patova](docs/jev-explained.md).
 
 Las pruebas usan respuestas simuladas y no consumen la API. El uso del juego sí.
 Hay un límite global local de 100 llamadas a proveedores por hora, cuerpo de petición limitado,

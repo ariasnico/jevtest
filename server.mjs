@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { newGame, publicGame } from './game.mjs';
 import { executeTurn, TurnError } from './lib/turns.mjs';
+import { endingFrames } from './public/ending-state.js';
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = '127.0.0.1';
@@ -15,6 +16,9 @@ const assets = new Map([
   ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
   ['/motion.js', ['motion.js', 'text/javascript; charset=utf-8']],
   ['/typewriter.js', ['typewriter.js', 'text/javascript; charset=utf-8']],
+  ['/ending.js', ['ending.js', 'text/javascript; charset=utf-8']],
+  ['/ending-state.js', ['ending-state.js', 'text/javascript; charset=utf-8']],
+  ...endingFrames.map(({ src }) => [src, [src.slice(1), 'image/webp']]),
   ['/assets/caramelo-door.png', ['assets/caramelo-door.png', 'image/png']]
 ]);
 const headers = {

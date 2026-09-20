@@ -1,5 +1,6 @@
 import { initMotion } from './motion.js';
 import { createTypewriter } from './typewriter.js';
+import { createEnding } from './ending.js';
 
 const $ = selector => document.querySelector(selector);
 const write = createTypewriter($('#guard-line'), $('#guard-announcement'));
@@ -8,6 +9,7 @@ let game;
 let busy = true;
 let audio;
 let sound = false;
+const ending = createEnding({ scene: $('#scene'), onRestart: start });
 
 function blip(won = false) {
   if (!sound || !audio) return;
@@ -30,6 +32,8 @@ function controls() {
   $('#message').disabled = !game || game.status !== 'playing';
   $('#send').disabled = disabled;
   $('#again').disabled = busy;
+  $('#enter').disabled = busy;
+  $('#ending-restart').disabled = busy;
   $('#form').setAttribute('aria-busy', String(busy));
 }
 function render() {
@@ -44,11 +48,14 @@ function render() {
   $('#ending').hidden = game.status === 'playing';
   if (game.status !== 'playing') {
     const won = game.status === 'won';
+    $('#enter').hidden = !won;
+    $('#again').hidden = won;
+    if (won) ending.admit();
     $('#ending-kicker').textContent = won ? 'LA SOGA SE CORRIÓ. LA NOCHE ES TUYA.' : 'FIN DE LA NOCHE · SEGUÍS EN LA VEREDA';
     $('#ending-title').textContent = won ? 'Bienvenido a Caramelo.' : 'Hoy no, maestro.';
     $('#ending-copy').textContent = won ? `Lo lograste en ${game.turns} intentos. Sin lista, sin contactos. Puro chamuyo.` : 'El after en la vereda también tiene lo suyo. Respirá, inventá otra historia y volvé a intentarlo.';
     $('#hint').textContent = won ? 'Objetivo cumplido. Ya podés presumir.' : 'Cada noche es una nueva oportunidad.';
-    $('#again').focus();
+    (won ? $('#enter') : $('#again')).focus({ preventScroll: true });
   }
   controls();
 }
@@ -68,6 +75,8 @@ function showError(error) {
   $('#error').hidden = false;
 }
 async function start() {
+  if (busy && game) return;
+  ending.reset();
   busy = true;
   controls();
   $('#error').hidden = true;

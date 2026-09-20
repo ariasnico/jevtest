@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import http from 'node:http';
 import { server } from '../server.mjs';
+import { endingFrames } from '../public/ending-state.js';
 
 test('HTTP boundaries protect private files, session state, origin and input', async t => {
   process.env.JEV_API_KEY = 'test-only-placeholder';
@@ -40,4 +41,13 @@ test('HTTP boundaries protect private files, session state, origin and input', a
   const root = await request('/');
   assert.equal(root.status, 200);
   assert.match(root.headers.get('content-security-policy'), /frame-ancestors 'none'/);
+  let endingBytes = 0;
+  for (const { src } of endingFrames) {
+    const asset = await request(src);
+    assert.equal(asset.status, 200);
+    assert.equal(asset.headers.get('content-type'), 'image/webp');
+    endingBytes += (await asset.arrayBuffer()).byteLength;
+  }
+  assert.ok(endingBytes <= 5_000_000, 'Ending assets exceed mobile budget');
+  assert.equal((await request('/assets/ending/private.png')).status, 404);
 });

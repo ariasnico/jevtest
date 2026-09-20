@@ -88,6 +88,19 @@ footer a { display: inline-flex; align-items: center; min-height: 44px; padding:
 .bubble p:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
 .bubble[data-pending="true"] .speaker::after { content: ' · PENSANDO'; color: var(--muted); }
 .scene:has(.ending:not([hidden])) .console { visibility: hidden; }
+.cinematic { position: absolute; inset: 0; z-index: 4; overflow: hidden; }
+.ending-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; transform-origin: 50% 38%; }
+.scene:is([data-ending-state="entering"], [data-ending-state="inside"], [data-ending-state="invitation"]) > :is(.bubble, .console, .scene-motion) { visibility: hidden; }
+.cinematic-bottom { position: absolute; inset: auto 0 0; padding: 44px 16px 16px; background: linear-gradient(transparent, #090909e8 35%, #090909fa); }
+#cinematic-caption { color: var(--pink); font-size: 10px; letter-spacing: 1px; line-height: 1.6; margin: 0 0 12px; }
+.cinematic-actions { display: flex; align-items: center; gap: 8px; }
+.cinematic-actions .quiet { min-width: 60px; font-size: 11px; color: var(--text); }
+#ending-restart { margin-left: auto; }
+#cinematic-outcome h2 { font: italic 27px/1.1 Georgia, serif; color: var(--gold); margin: 0 0 8px; }
+#cinematic-outcome p { font-size: 11px; margin: 0 0 14px; }
+.bubble-invitation { top: 7%; right: 4%; width: 78%; background: #080808c9; border-color: #e9a9b680; }
+.bubble-invitation::after { right: 22%; background: #080808c9; border-color: #e9a9b680; }
+.bubble-invitation p { max-height: none; }
 @media (min-width: 600px) {
   .cabinet { padding-top: 12px; }
   .topbar { font-size: 10px; min-height: 52px; }

@@ -126,7 +126,10 @@ export async function initMotion() {
     button.append(label);
     // Manual pause freezes the frame. Reduced motion always shows the original.
     if (reduced.matches) canvas.hidden = true;
-    const running = active && inView && !document.hidden && document.querySelector('#ending').hidden;
+    const cinematic = !['door', 'admitted', undefined].includes(scene.dataset.endingState);
+    button.hidden = cinematic;
+    if (cinematic) canvas.hidden = true;
+    const running = active && !cinematic && inView && !document.hidden && document.querySelector('#ending').hidden;
     canvas.dataset.running = String(running);
     if (!running) return;
     draw();
@@ -188,6 +191,7 @@ export async function initMotion() {
     viewObserver.observe(scene);
     endObserver = new MutationObserver(sync);
     endObserver.observe(document.querySelector('#ending'), { attributes: true, attributeFilter: ['hidden'] });
+    endObserver.observe(scene, { attributes: true, attributeFilter: ['data-ending-state'] });
     sync();
   } catch {
     // WebGL/image decoding is optional: the complete static game remains usable.

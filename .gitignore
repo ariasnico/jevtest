@@ -16,6 +16,8 @@ node_modules/
 dist/
 build/
 coverage/
+test-results/
+playwright-report/
 .venv/
 venv/
 __pycache__/
