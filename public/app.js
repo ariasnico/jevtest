@@ -1,6 +1,9 @@
 import { initMotion } from './motion.js';
+import { createTypewriter } from './typewriter.js';
 
 const $ = selector => document.querySelector(selector);
+const write = createTypewriter($('#guard-line'), $('#guard-announcement'));
+let pendingTurn;
 let game;
 let busy = true;
 let audio;
@@ -50,11 +53,13 @@ function render() {
   controls();
 }
 async function request(path, body) {
-  const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(20000) });
+  const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(23000) });
   const data = await response.json();
   if (!response.ok) {
-    if (response.status === 401) $('#retry').hidden = false;
-    throw new Error(data.error || 'No pudimos hablar con el patova.');
+    if (response.status === 401 || ['stale', 'limit'].includes(data.code)) $('#retry').hidden = false;
+    const error = new Error(data.error || 'No pudimos hablar con el patova.');
+    error.code = data.code;
+    throw error;
   }
   return data;
 }
@@ -69,6 +74,7 @@ async function start() {
   $('#retry').hidden = true;
   try {
     game = await request('/api/start', {});
+    pendingTurn = undefined;
     $('#messages').replaceChildren();
     $('#player-bubble').hidden = true;
     $('#player-line').textContent = '';
@@ -94,6 +100,12 @@ $('#form').addEventListener('submit', async event => {
   event.preventDefault();
   const message = $('#message').value.trim();
   if (busy || !message || game?.status !== 'playing') return;
+  if (pendingTurn && pendingTurn.message !== message) {
+    showError(new Error('Primero reenviá el mensaje anterior para recuperar su respuesta, o empezá otra noche.'));
+    $('#retry').hidden = false;
+    return;
+  }
+  pendingTurn ??= { message, turnId: crypto.randomUUID(), expectedVersion: game.version };
   busy = true;
   controls();
   $('#error').hidden = true;
@@ -103,7 +115,8 @@ $('#form').addEventListener('submit', async event => {
   $('#guard-bubble').dataset.pending = 'true';
   $('#guard-line').textContent = 'Te mira de arriba abajo. Está pensando…';
   try {
-    game = await request('/api/talk', { message });
+    game = await request('/api/talk', pendingTurn);
+    pendingTurn = undefined;
     historyEntry('VOS', message);
     historyEntry('EL PATOVA', game.line);
     if ($('#message').value.trim() === message) {
@@ -111,7 +124,12 @@ $('#form').addEventListener('submit', async event => {
       $('#count').textContent = '0 / 280';
     }
     blip(game.status === 'won');
-  } catch (error) { showError(error); }
+    $('#guard-bubble').dataset.pending = 'false';
+    await write(game.line);
+  } catch (error) {
+    if (error.code && error.code !== 'pending') pendingTurn = undefined;
+    showError(error);
+  }
   finally {
     busy = false;
     render();

@@ -8,13 +8,14 @@ Hecho con JavaScript, caracteres y decisiones de [Jev](https://typesafe.ai).
 
 ## Jugar en tu máquina
 
-Requiere Node.js 22.9 o superior y una API key de TypeSafe con acceso a Jev.
+Requiere Node.js 22.9 o superior, una API key de TypeSafe con acceso a Jev
+y una API key de OpenAI con acceso a GPT-5.6 Luna.
 No requiere instalar dependencias.
 
 ```sh
 cp .env.example .env
 chmod 600 .env
-# Editá .env localmente y completá JEV_API_KEY.
+# Editá .env localmente y completá JEV_API_KEY y OPENAI_API_KEY.
 npm start
 ```
 
@@ -23,17 +24,28 @@ El servidor escucha exclusivamente en la interfaz local. No es un despliegue pú
 
 ## Cómo funciona
 
-Cada mensaje hace una llamada real a `jev-latest` usando el endpoint oficial
-`https://api.typesafe.ai/v1/systemone`. Jev clasifica la reacción del patova entre
-nueve opciones, teniendo en cuenta la conversación. El código aplica puntos,
-selecciona una frase escrita de antemano y decide si entrás.
+Jev evalúa la intención, novedad, relevancia, contradicciones y amenazas del
+chamuyo, considerando el historial. El código aplica las reglas y determina si
+entrás; **GPT-5.6 Luna redacta** una respuesta original de una o dos frases
+(máximo 180 caracteres). Jev verifica que sea relevante, coherente con la decisión
+y que no invente hechos. Si no pasa, se regenera una vez. Una falla no consume
+el turno ni se oculta detrás de frases prefabricadas.
+
+Se usa la Responses API con `reasoning.effort: none` y `store: false`.
+El modelo se configura con `OPENAI_DIALOGUE_MODEL`; cambiarlo exige verificar
+compatibilidad y calidad. [Ficha oficial de Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna).
+Cada turno normalmente hace tres llamadas (dos a Jev y una a OpenAI), hasta cinco
+con regeneración. Los envíos tienen identificador y versión: repetir un envío
+ya completado devuelve la misma respuesta sin cobrar ni aplicar otro turno.
+Un fallo definitivo requiere un nuevo envío; una desconexión conserva el ID para
+recuperar el resultado. Los registros de idempotencia viven solo en memoria.
 
 El medidor muestra puntos del juego, **no probabilidades del modelo**. Arrancás
-con 12 y necesitás 80 en seis intentos. La agresión termina la partida.
-No hay otro modelo generando diálogo ni simulación oculta cuando falla la API.
+con 12 y necesitás 80 en seis intentos. Llegar a cero no termina la charla;
+una amenaza seria detectada con alta confianza sí. La incertidumbre no suma puntos.
 La escena es una imagen de alta densidad visual ASCII, generada con GPT Image
 a partir de un sketch del usuario. El juego usa el archivo incluido en el repo;
-no necesita una clave de OpenAI para jugar. El [prompt del arte](docs/art-direction.md)
+no genera imágenes durante la partida. El [prompt del arte](docs/art-direction.md)
 documenta cómo se generó.
 
 La ilustración tiene un ciclo de movimiento a **6 FPS**: respiración y cambios
@@ -46,14 +58,17 @@ la imagen estática; el juego sigue funcionando.
 La interfaz está pensada primero para celular: escena vertical, personajes en
 primer plano, controles táctiles y cuadro de texto dentro de la ilustración.
 Al enviar, tu mensaje aparece en una burbuja negra junto al personaje y la
-respuesta en otra junto al patova. Los mensajes largos se pueden desplazar en
+respuesta en otra junto al patova. El diálogo validado aparece progresivamente
+(no es streaming de tokens del proveedor). Tocarlo o presionar Enter sobre él
+lo completa. Con movimiento reducido aparece inmediatamente; los lectores de
+pantalla reciben la frase completa una sola vez. Los mensajes largos se pueden desplazar en
 su burbuja y también consultar completos en el historial. El texto de entrada
 usa 16 px para evitar el zoom
 automático de iOS. Enter envía; Shift+Enter agrega una línea en escritorio.
 La dirección `localhost` se abre en la máquina que ejecuta el servidor: para
 acceder desde un teléfono físico hace falta configurar acceso de red o alojamiento.
 
-Los mensajes y el historial de la partida se envían a TypeSafe para su evaluación.
+Los mensajes y el historial se envían a TypeSafe y OpenAI para evaluar y redactar.
 No escribas información privada. El servidor guarda las partidas en memoria
 durante una hora; no persiste conversaciones ni registra su contenido.
 
@@ -64,7 +79,7 @@ npm test
 ```
 
 Las pruebas usan respuestas simuladas y no consumen la API. El uso del juego sí.
-Hay un límite global local de 100 mensajes por hora, cuerpo de petición limitado,
+Hay un límite global local de 100 llamadas a proveedores por hora, cuerpo de petición limitado,
 validación de origen y sesiones con cookies HttpOnly/SameSite. Antes de alojarlo
 en internet hacen falta HTTPS, autenticación o controles de abuso, presupuestos
 persistentes y una configuración de origen adecuada. No expongas este servidor

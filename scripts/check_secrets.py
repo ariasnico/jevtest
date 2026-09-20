@@ -14,7 +14,7 @@ PATTERNS = [
     rb"sk-[A-Za-z0-9_-]{20,}",
     rb"AKIA[A-Z0-9]{16}",
     rb"-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED )?PRIVATE KEY-----",
-    rb"(?im)^\s*(?:export\s+)?[A-Z0-9_]*(?:API_KEY|API_TOKEN|SECRET|PASSWORD)\s*=\s*[\"']?[^\s\"'#][^\r\n]*",
+    rb"(?im)^[ \t]*(?:export[ \t]+)?[A-Z0-9_]*(?:API_KEY|API_TOKEN|SECRET|PASSWORD)[ \t]*=[ \t]*[\"']?[^\s\"'#][^\r\n]*",
 ]
 
 

@@ -71,6 +71,8 @@ footer a { display: inline-flex; align-items: center; min-height: 44px; padding:
 .ending p { font-size: 11px; line-height: 1.5; max-width: 350px; margin: 0 0 12px; }
 #ending-kicker { font-size: 9px; letter-spacing: 2px; color: var(--pink); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+#guard-line.typing { display: grid; cursor: pointer; }
+#guard-line.typing > span { grid-area: 1 / 1; }
 [hidden] { display: none !important; }
 .bubble { position: absolute; z-index: 1; padding: 11px 13px; background: #080808f5; border: 1px solid #8c7b5e; border-radius: 14px; box-shadow: 0 4px 16px #0008; }
 .bubble::after { content: ''; position: absolute; width: 12px; height: 12px; background: #080808; border-right: 1px solid #8c7b5e; border-bottom: 1px solid #8c7b5e; bottom: -7px; transform: rotate(45deg); }

@@ -6,6 +6,7 @@ import { server } from '../server.mjs';
 
 test('HTTP boundaries protect private files, session state, origin and input', async t => {
   process.env.JEV_API_KEY = 'test-only-placeholder';
+  process.env.OPENAI_API_KEY = 'test-only-placeholder';
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
   t.after(() => { server.closeAllConnections(); server.close(); });

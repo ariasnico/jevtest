@@ -2,7 +2,8 @@ import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { askJev, applyDecision, newGame, publicGame } from './game.mjs';
+import { newGame, publicGame } from './game.mjs';
+import { executeTurn, TurnError } from './lib/turns.mjs';
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = '127.0.0.1';
@@ -13,6 +14,7 @@ const assets = new Map([
   ['/style.css', ['style.css', 'text/css; charset=utf-8']],
   ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
   ['/motion.js', ['motion.js', 'text/javascript; charset=utf-8']],
+  ['/typewriter.js', ['typewriter.js', 'text/javascript; charset=utf-8']],
   ['/assets/caramelo-door.png', ['assets/caramelo-door.png', 'image/png']]
 ]);
 const headers = {
@@ -47,6 +49,7 @@ export const server = http.createServer(async (req, res) => {
     if (req.method !== 'POST' || !['/api/start', '/api/talk'].includes(path)) return json(res, 404, { error: 'No encontrado.' });
     if (req.headers.origin !== `http://${req.headers.host}` || req.headers['content-type']?.split(';')[0] !== 'application/json') return json(res, 403, { error: 'Origen no permitido.' });
     if (!process.env.JEV_API_KEY) return json(res, 503, { error: 'Falta configurar JEV_API_KEY en el .env del servidor.' });
+    if (!process.env.OPENAI_API_KEY) return json(res, 503, { error: 'Falta configurar OPENAI_API_KEY en el .env del servidor.' });
     for (const [id, game] of sessions) if (game.expires < Date.now() && !game.busy) sessions.delete(id);
     if (path === '/api/start') {
       if (sessions.size >= 500) return json(res, 429, { error: 'La puerta está llena. Volvé en un rato.' });
@@ -61,23 +64,21 @@ export const server = http.createServer(async (req, res) => {
     const id = req.headers.cookie?.match(/(?:^|;\s*)caramelo=([a-f0-9]{48})(?:;|$)/)?.[1];
     const game = sessions.get(id);
     if (!game) return json(res, 401, { error: 'La noche terminó. Empezá una nueva partida.' });
-    if (game.status !== 'playing' || game.busy) return json(res, 409, { error: 'Esperá la respuesta o empezá otra noche.' });
     let body;
     try { body = await readBody(req); } catch { return json(res, 400, { error: 'Mensaje inválido.' }); }
     const message = typeof body?.message === 'string' ? body.message.trim() : '';
     if (!message || message.length > 280) return json(res, 400, { error: 'Escribí entre 1 y 280 caracteres.' });
-    // Another request may have acquired the session while this body was streaming.
-    if (game.busy || game.status !== 'playing' || sessions.get(id) !== game) return json(res, 409, { error: 'Esperá la respuesta o empezá otra noche.' });
-    if (Date.now() - budget.start > 3600000) budget = { start: Date.now(), calls: 0 };
-    if (budget.calls >= 100) return json(res, 429, { error: 'Llegamos al límite local de 100 mensajes por hora. Volvé más tarde.' });
-    game.busy = true;
-    budget.calls++;
+    if (!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.turnId) || !Number.isSafeInteger(body.expectedVersion) || body.expectedVersion < 0) return json(res, 400, { error: 'Identificador de turno inválido.' });
+    if (sessions.get(id) !== game) return json(res, 409, { error: 'La partida cambió. Empezá otra noche.', code: 'stale' });
     try {
-      const choice = await askJev(game, message);
-      return json(res, 200, applyDecision(game, message, choice));
-    } catch {
-      return json(res, 502, { error: 'El handy del patova se quedó sin señal. Probá de nuevo; no perdiste un intento.' });
-    } finally { game.busy = false; }
+      return json(res, 200, await executeTurn(game, { ...body, message }, { beforeCall() {
+        if (Date.now() - budget.start > 3600000) budget = { start: Date.now(), calls: 0 };
+        if (budget.calls >= 100) throw new TurnError(429, 'Llegamos al límite local de 100 llamadas por hora. Volvé más tarde.', 'failed');
+        budget.calls++;
+      } }));
+    } catch (error) {
+      return json(res, error instanceof TurnError ? error.status : 502, { error: error instanceof TurnError ? error.message : 'No pudimos responder.', code: error.code || 'failed' });
+    }
   } catch {
     if (!res.headersSent) json(res, 500, { error: 'Algo falló en la puerta. Intentá otra vez.' });
     else res.end();

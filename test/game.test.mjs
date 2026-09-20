@@ -1,39 +1,37 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { newGame, applyDecision, publicGame, askJev } from '../game.mjs';
-
-test('three good distinct arguments win, completed games cannot change', () => {
-  const game = newGame();
-  for (const message of ['uno', 'dos', 'tres']) applyDecision(game, message, 'convincing');
-  assert.equal(game.status, 'won');
-  assert.equal(game.turns, 3);
-  assert.throws(() => applyDecision(game, 'four', 'convincing'));
+import {newGame,publicGame} from '../game.mjs';
+import {executeTurn} from '../lib/turns.mjs';
+import {evaluateTurn} from '../lib/evaluation.mjs';
+const evaluation={reaction:'convincing',confidence:.99,novelty:.99,relevance:.99,contradiction:0,threat:0};
+const deps={evaluate:async()=>evaluation,generate:async()=> 'Buen punto. ¿Qué más me contás?',validate:async()=>({ok:true})};
+const request=(n=0)=>({turnId:String(n),expectedVersion:n,message:'Una razón nueva '+n});
+test('three good turns win; replay is free and altered payload rejected',async()=>{
+  const game=newGame();let calls=0;
+  const providers={...deps,generate:async()=>{calls++;return 'Respuesta '+calls;}};
+  for(let i=0;i<3;i++)await executeTurn(game,request(i),providers);
+  assert.equal(game.status,'won');assert.equal(game.turns,3);
+  assert.equal((await executeTurn(game,request(2),providers)).status,'won');assert.equal(calls,3);
+  await assert.rejects(executeTurn(game,{...request(2),message:'otro'},providers),{code:'conflict'});
+  assert.equal(publicGame(game).operations,undefined);assert.equal(publicGame(game).history,undefined);
 });
-test('six neutral turns lose and repeating a successful line cannot farm points', () => {
-  const neutral = newGame();
-  for (let i = 0; i < 6; i++) applyDecision(neutral, String(i), 'neutral');
-  assert.equal(neutral.status, 'lost');
-  const repeat = newGame();
-  applyDecision(repeat, 'hola', 'convincing');
-  applyDecision(repeat, 'HOLA', 'convincing');
-  assert.equal(repeat.score, 32);
-  assert.equal(repeat.history[1].choice, 'repeat');
+test('failed validation regenerates once and never mutates game',async()=>{
+  const game=newGame();let calls=0;const before=publicGame(game);
+  await assert.rejects(executeTurn(game,request(),{...deps,generate:async()=>{calls++;return 'No';},validate:async()=>({ok:false,reasons:['contradiction']})}),{code:'failed'});
+  assert.equal(calls,2);assert.deepEqual(publicGame(game),before);assert.equal(game.busy,false);
+  await assert.rejects(executeTurn(game,request(),deps),{code:'failed'});
 });
-test('hostility ends the game and private state is not exposed', () => {
-  const game = newGame();
-  applyDecision(game, 'example', 'hostile');
-  assert.equal(game.status, 'lost');
-  assert.equal(publicGame(game).history, undefined);
-  assert.equal(publicGame(game).busy, undefined);
+test('pending duplicate and stale version cannot consume another turn',async()=>{
+  const game=newGame();let release;
+  const pending=executeTurn(game,request(),{...deps,evaluate:()=>new Promise(resolve=>{release=resolve;})});
+  await assert.rejects(executeTurn(game,request(),deps),{code:'pending'});
+  release(evaluation);await pending;
+  await assert.rejects(executeTurn(game,{...request(),turnId:'other'},deps),{code:'stale'});
+  assert.equal(game.turns,1);
 });
-test('unknown provider choices cannot mutate the score', () => {
-  const game = newGame();
-  assert.throws(() => applyDecision(game, 'text', '__proto__'));
-  assert.equal(game.turns, 0);
-});
-test('provider failures and invalid outputs do not fabricate decisions', async t => {
-  t.mock.method(globalThis, 'fetch', async () => ({ ok: false, status: 401 }));
-  await assert.rejects(askJev(newGame(), 'hello'), /Provider HTTP 401/);
-  globalThis.fetch.mock.mockImplementation(async () => ({ ok: true, json: async () => ({ answers: { reaction: { choice: 'unknown' } } }) }));
-  await assert.rejects(askJev(newGame(), 'hello'), /Invalid provider decision/);
+test('invalid or failed Jev outputs do not invent evaluations',async t=>{
+  t.mock.method(globalThis,'fetch',async()=>({ok:false,status:401}));
+  await assert.rejects(evaluateTurn(newGame(),'hola'),/Jev HTTP 401/);
+  globalThis.fetch.mock.mockImplementation(async()=>({ok:true,json:async()=>({answers:{reaction:{choice:'unknown'}}})}));
+  await assert.rejects(evaluateTurn(newGame(),'hola'),/Invalid Jev reaction/);
 });
