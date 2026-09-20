@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Convencé al patova. Un juego ASCII con Jev.",
   "engines": {
-    "node": ">=22.9"
+    "node": "22.x"
   },
   "scripts": {
     "start": "node --env-file-if-exists=.env server.mjs",

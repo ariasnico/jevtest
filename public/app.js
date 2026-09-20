@@ -63,6 +63,7 @@ async function request(path, body) {
   const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(23000) });
   const data = await response.json();
   if (!response.ok) {
+    if (data.code === 'auth_required') location.replace('/login.html');
     if (response.status === 401 || ['stale', 'limit'].includes(data.code)) $('#retry').hidden = false;
     const error = new Error(data.error || 'No pudimos hablar con el patova.');
     error.code = data.code;

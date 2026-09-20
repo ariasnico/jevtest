@@ -6,6 +6,10 @@ Un pequeño juego de chamuyo en ASCII. Estás en la puerta del boliche Caramelo,
 no figurás en la lista y tenés seis intentos para convencer al patova.
 Hecho con JavaScript, caracteres y decisiones de [Jev](https://typesafe.ai).
 
+**Beta para amigos:** [caramelo-jev.vercel.app](https://caramelo-jev.vercel.app).
+Requiere la contraseña de tu invitación; funciona en celular y escritorio.
+El acceso conserva la estética ASCII/dorada del juego.
+
 ## Jugar en tu máquina
 
 Requiere Node.js 22.9 o superior, una API key de TypeSafe con acceso a Jev
@@ -38,7 +42,8 @@ Cada turno normalmente hace tres llamadas (dos a Jev y una a OpenAI), hasta cinc
 con regeneración. Los envíos tienen identificador y versión: repetir un envío
 ya completado devuelve la misma respuesta sin cobrar ni aplicar otro turno.
 Un fallo definitivo requiere un nuevo envío; una desconexión conserva el ID para
-recuperar el resultado. Los registros de idempotencia viven solo en memoria.
+recuperar el resultado. En local viven en memoria; en Vercel se persisten en Redis
+con bloqueo distribuido para evitar turnos/cobros duplicados.
 
 El medidor muestra puntos del juego, **no probabilidades del modelo**. Arrancás
 con 12 y necesitás 80 en seis intentos. Llegar a cero no termina la charla;
@@ -79,8 +84,8 @@ La dirección `localhost` se abre en la máquina que ejecuta el servidor: para
 acceder desde un teléfono físico hace falta configurar acceso de red o alojamiento.
 
 Los mensajes y el historial se envían a TypeSafe y OpenAI para evaluar y redactar.
-No escribas información privada. El servidor guarda las partidas en memoria
-durante una hora; no persiste conversaciones ni registra su contenido.
+No escribas información privada. En local las partidas viven en memoria; en Vercel
+se guardan en Redis con vencimiento de una hora. La aplicación no registra su contenido en logs.
 
 ## Verificación
 
@@ -107,9 +112,10 @@ Para entender el contrato real de Jev y las reglas, consultá
 Las pruebas usan respuestas simuladas y no consumen la API. El uso del juego sí.
 Hay un límite global local de 100 llamadas a proveedores por hora, cuerpo de petición limitado,
 validación de origen y sesiones con cookies HttpOnly/SameSite. Antes de alojarlo
-en internet hacen falta HTTPS, autenticación o controles de abuso, presupuestos
-persistentes y una configuración de origen adecuada. No expongas este servidor
-por un túnel público con una clave personal.
+en internet no uses el servidor local por un túnel público con una clave personal.
+La versión Vercel agrega contraseña hasheada, cookies firmadas, límites por IP y
+presupuesto global persistente de US$2/día con reservas conservadoras.
+Ver [despliegue, límites y operación](docs/deployment.md).
 
 ## Desarrollo
 
