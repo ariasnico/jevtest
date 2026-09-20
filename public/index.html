@@ -25,18 +25,23 @@
       <div class="scene" id="scene" role="group" aria-label="En la puerta de Caramelo">
         <img class="scene-art" src="/assets/caramelo-door.png" alt="Arte ASCII detallado: vos, a la izquierda, mirás hacia arriba al enorme patova de brazos cruzados. Detrás brilla el cartel de Caramelo." fetchpriority="high" decoding="async" width="1086" height="1448">
         <canvas class="scene-motion" aria-hidden="true" hidden></canvas>
-        <div class="scene-caption" aria-hidden="true"><span>VOS ↗</span><span>EL PATOVA ↗</span></div>
+        <div class="bubble bubble-guard" id="guard-bubble">
+          <span class="speaker">EL PATOVA</span>
+          <p id="guard-line" tabindex="0" aria-live="polite">Buenas. Lista cerrada, casa llena. Dame una buena razón para abrir esa soga.</p>
+        </div>
+        <div class="bubble bubble-player" id="player-bubble" hidden>
+          <span class="speaker">VOS</span>
+          <p id="player-line" tabindex="0" aria-live="polite"></p>
+        </div>
         <div id="ending" class="ending" hidden>
           <p id="ending-kicker"></p>
           <h2 id="ending-title"></h2>
           <p id="ending-copy"></p>
           <button id="again" class="primary">OTRA NOCHE ↗</button>
         </div>
-      </div>
       <div class="console">
         <div class="statusbar"><span id="mood">◈ Cara de póker</span><span id="turns">INTENTOS 0 / 6</span></div>
         <div class="trust"><label for="trust" class="sr-only">Buena onda del patova</label><meter id="trust" min="0" max="100" value="12">12 de 100</meter></div>
-        <div class="dialogue"><span class="speaker">EL PATOVA</span><p id="guard-line" aria-live="polite">Buenas. Lista cerrada, casa llena. Dame una buena razón para abrir esa soga.</p></div>
         <form id="form">
           <label class="sr-only" for="message">¿Qué le decís al patova?</label>
           <div class="input-wrap">
@@ -44,12 +49,13 @@
             <textarea id="message" rows="2" maxlength="280" autocomplete="off" enterkeyhint="send" placeholder="Tirá tu mejor chamuyo…" required disabled aria-describedby="hint"></textarea>
             <button id="send" class="primary" type="submit" aria-label="Enviar mensaje al patova" disabled><span class="send-label">DECÍSELO</span><span class="send-arrow" aria-hidden="true">↗</span></button>
           </div>
-          <div class="input-foot"><span id="hint">No estás en la lista. Hacelo cambiar de opinión.</span><span id="count">0 / 280</span></div>
+          <div class="input-foot"><span id="hint">Seis intentos. Convencelo.</span><span id="count">0 / 280</span></div>
         </form>
         <p id="error" role="alert" hidden></p>
         <button id="retry" class="quiet" hidden>REINTENTAR CONEXIÓN ↗</button>
-        <details id="history"><summary>LO QUE DIJISTE <span aria-hidden="true">+</span></summary><ol id="messages"></ol></details>
       </div>
+      </div>
+      <details id="history"><summary>LO QUE DIJISTE <span aria-hidden="true">+</span></summary><ol id="messages"></ol></details>
     </section>
     <footer><span>UN JUEGO DE CHAMUYO.</span><span><a href="https://typesafe.ai" target="_blank" rel="noreferrer">Jev ↗</a><span class="footer-dot">·</span><a href="https://github.com/ariasnico/jevtest" target="_blank" rel="noreferrer">GitHub ↗</a></span></footer>
   </main>

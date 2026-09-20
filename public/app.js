@@ -31,6 +31,8 @@ function controls() {
 }
 function render() {
   $('#guard-line').textContent = game.line;
+  $('#guard-line').scrollTop = 0;
+  $('#guard-bubble').dataset.pending = 'false';
   $('#mood').textContent = `◈ ${game.mood}`;
   $('#trust').value = game.score;
   $('#trust').textContent = `${game.score} de 100`;
@@ -68,9 +70,11 @@ async function start() {
   try {
     game = await request('/api/start', {});
     $('#messages').replaceChildren();
+    $('#player-bubble').hidden = true;
+    $('#player-line').textContent = '';
     $('#message').value = '';
     $('#count').textContent = '0 / 280';
-    $('#hint').textContent = 'No estás en la lista. Hacelo cambiar de opinión.';
+    $('#hint').textContent = 'Seis intentos. Convencelo.';
     $('#history').open = false;
     busy = false;
     render();
@@ -93,6 +97,10 @@ $('#form').addEventListener('submit', async event => {
   busy = true;
   controls();
   $('#error').hidden = true;
+  $('#player-line').textContent = message;
+  $('#player-line').scrollTop = 0;
+  $('#player-bubble').hidden = false;
+  $('#guard-bubble').dataset.pending = 'true';
   $('#guard-line').textContent = 'Te mira de arriba abajo. Está pensando…';
   try {
     game = await request('/api/talk', { message });

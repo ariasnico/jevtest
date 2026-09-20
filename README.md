@@ -44,7 +44,11 @@ ocultas y al terminar la partida. Con movimiento reducido o sin WebGL se muestra
 la imagen estática; el juego sigue funcionando.
 
 La interfaz está pensada primero para celular: escena vertical, personajes en
-primer plano, controles táctiles y cuadro de texto de 16 px para evitar el zoom
+primer plano, controles táctiles y cuadro de texto dentro de la ilustración.
+Al enviar, tu mensaje aparece en una burbuja negra junto al personaje y la
+respuesta en otra junto al patova. Los mensajes largos se pueden desplazar en
+su burbuja y también consultar completos en el historial. El texto de entrada
+usa 16 px para evitar el zoom
 automático de iOS. Enter envía; Shift+Enter agrega una línea en escritorio.
 La dirección `localhost` se abre en la máquina que ejecuta el servidor: para
 acceder desde un teléfono físico hace falta configurar acceso de red o alojamiento.
