@@ -74,14 +74,15 @@ footer a { display: inline-flex; align-items: center; min-height: 44px; padding:
 [hidden] { display: none !important; }
 .bubble { position: absolute; z-index: 1; padding: 11px 13px; background: #080808f5; border: 1px solid #8c7b5e; border-radius: 14px; box-shadow: 0 4px 16px #0008; }
 .bubble::after { content: ''; position: absolute; width: 12px; height: 12px; background: #080808; border-right: 1px solid #8c7b5e; border-bottom: 1px solid #8c7b5e; bottom: -7px; transform: rotate(45deg); }
-.bubble-guard { top: 3%; right: 3%; width: 65%; }
-.bubble-guard::after { right: 30%; }
-.bubble-player { top: 43%; left: 3%; width: 57%; }
-.bubble-player::after { left: 36%; bottom: auto; top: -7px; transform: rotate(225deg); }
+.bubble-guard { top: 3%; right: 3%; width: 65%; background: #08080885; border-color: #c9b08766; box-shadow: 0 2px 8px #0003; text-shadow: 0 1px 2px #000, 0 0 5px #000; }
+.bubble-guard::after { right: 30%; background: #08080885; border-color: #c9b08766; }
+/* Follow the mouth in the image, including its minimum-height mobile crop. */
+.bubble-player { top: max(64cqw, 236px); left: 3%; width: 57%; }
+.bubble-player::after { left: 54%; bottom: auto; top: -7px; transform: rotate(225deg); }
 .bubble .speaker { font-size: 8px; margin-bottom: 5px; color: var(--gold); }
 .bubble p { font-size: 12px; line-height: 1.5; margin: 0; max-height: 90px; overflow-y: auto; overflow-wrap: anywhere; white-space: pre-wrap; scrollbar-width: thin; scrollbar-color: #8c7b5e #080808; }
 .bubble-guard p { max-height: clamp(54px, 16cqw, 78px); }
-.bubble-player p { max-height: clamp(36px, 15cqw, 78px); }
+.bubble-player p { max-height: clamp(36px, 8cqw, 48px); }
 .bubble p:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
 .bubble[data-pending="true"] .speaker::after { content: ' · PENSANDO'; color: var(--muted); }
 .scene:has(.ending:not([hidden])) .console { visibility: hidden; }
