@@ -1,0 +1,29 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets/
+.secrets/
+
+# Dependencies and build artifacts
+node_modules/
+dist/
+build/
+coverage/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Local editor, OS, and runtime files
+.idea/
+.vscode/
+.DS_Store
+*.log
+tmp/
+.cache/
