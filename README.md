@@ -36,6 +36,13 @@ a partir de un sketch del usuario. El juego usa el archivo incluido en el repo;
 no necesita una clave de OpenAI para jugar. El [prompt del arte](docs/art-direction.md)
 documenta cómo se generó.
 
+La ilustración tiene un ciclo de movimiento a **6 FPS**: respiración y cambios
+leves de postura, con luz tenue en el cartel. Un shader WebGL desplaza zonas de
+la imagen original sin descargar video ni hacer llamadas adicionales a modelos.
+El botón de pausa congela el cuadro. Se detiene fuera de pantalla, en pestañas
+ocultas y al terminar la partida. Con movimiento reducido o sin WebGL se muestra
+la imagen estática; el juego sigue funcionando.
+
 La interfaz está pensada primero para celular: escena vertical, personajes en
 primer plano, controles táctiles y cuadro de texto de 16 px para evitar el zoom
 automático de iOS. Enter envía; Shift+Enter agrega una línea en escritorio.

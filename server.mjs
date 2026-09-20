@@ -12,6 +12,7 @@ const assets = new Map([
   ['/', ['index.html', 'text/html; charset=utf-8']],
   ['/style.css', ['style.css', 'text/css; charset=utf-8']],
   ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
+  ['/motion.js', ['motion.js', 'text/javascript; charset=utf-8']],
   ['/assets/caramelo-door.png', ['assets/caramelo-door.png', 'image/png']]
 ]);
 const headers = {

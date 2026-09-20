@@ -1,3 +1,5 @@
+import { initMotion } from './motion.js';
+
 const $ = selector => document.querySelector(selector);
 let game;
 let busy = true;
@@ -129,3 +131,4 @@ $('#sound').addEventListener('click', async () => {
   } catch { $('#sound').textContent = 'SONIDO NO DISPONIBLE'; }
 });
 start();
+initMotion();

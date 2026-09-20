@@ -16,11 +16,15 @@
     <h1 class="sr-only">Caramelo. Convencé al patova.</h1>
     <header class="topbar">
       <span><i class="light" aria-hidden="true"></i> BUENOS AIRES <span class="time">/ 02:47 AM</span></span>
-      <button id="sound" class="quiet" aria-label="Activar sonido" aria-pressed="false">♪ SONIDO OFF</button>
+      <div class="scene-controls">
+        <button id="motion" class="quiet" aria-label="Pausar animación" aria-pressed="true" hidden>Ⅱ <span class="motion-label">ANIMACIÓN</span></button>
+        <button id="sound" class="quiet" aria-label="Activar sonido" aria-pressed="false">♪ SONIDO OFF</button>
+      </div>
     </header>
     <section class="game" aria-label="Convencé al patova para entrar a Caramelo">
       <div class="scene" id="scene" role="group" aria-label="En la puerta de Caramelo">
         <img class="scene-art" src="/assets/caramelo-door.png" alt="Arte ASCII detallado: vos, a la izquierda, mirás hacia arriba al enorme patova de brazos cruzados. Detrás brilla el cartel de Caramelo." fetchpriority="high" decoding="async" width="1086" height="1448">
+        <canvas class="scene-motion" aria-hidden="true" hidden></canvas>
         <div class="scene-caption" aria-hidden="true"><span>VOS ↗</span><span>EL PATOVA ↗</span></div>
         <div id="ending" class="ending" hidden>
           <p id="ending-kicker"></p>
