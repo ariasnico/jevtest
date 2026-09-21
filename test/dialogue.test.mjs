@@ -11,6 +11,15 @@ test('semantic validation rejects admission against the game decision', async t 
   const result=await validateDialogue({history:[],message:'Hola',line:'Pasá.',decision:{status:'playing'}});
   assert.deepEqual(result,{ok:false,reasons:['contradiction']});
 });
+test('validator receives the question the player is answering, including the first turn',async t=>{
+  let state;
+  t.mock.method(globalThis,'fetch',async(_url,options)=>{
+    state=JSON.parse(options.body).state;
+    return {ok:true,json:async()=>({answers:{related:{noul:.99},incompatible:{noul:.01},grounded:{noul:.99}}})};
+  });
+  await validateDialogue({chapter:'vip',history:[],currentLine:'¿Qué plan traés?',message:'Bailar con todo el grupo.',line:'Ese plan suena bien.',decision:{status:'playing'}});
+  assert.equal(state.last_character_line,'¿Qué plan traés?');
+});
 test('incomplete generation and malformed validation are failures', async t => {
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({status:'incomplete',output:[]})}));
   await assert.rejects(generateDialogue({history:[],message:'Hola',decision:{status:'playing'}}),/Incomplete/);

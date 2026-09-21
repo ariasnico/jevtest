@@ -14,7 +14,11 @@ una personalidad distinta y la condición ganada/perdida es siempre autoritativa
 
 Los cierres del VIP (victoria o derrota) son frases de guion deliberadas: una vez
 que Jev y las reglas deciden el resultado, otro modelo no puede impedir aplicarlo.
-Durante la conversación, las réplicas sí se generan y validan en cada turno.
+Durante la conversación, las réplicas se generan y validan en cada turno.
+Si el escritor o el validador falla dos veces, se usa una frase de respaldo
+de guion acorde a la reacción y decisión ya calculadas por Jev. No se inventan
+evaluaciones ni se acepta el texto que fue rechazado. Esta recuperación también
+aplica al patova. Los finales de ambos capítulos son autoritativos.
 
 ## Integración y seguridad
 

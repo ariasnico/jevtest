@@ -75,7 +75,9 @@ también en código. La afinidad es un puntaje nuestro, no una probabilidad de J
 
 Luna recibe la decisión calculada y redacta hasta 180 caracteres. Otra llamada a
 Jev valida pertinencia, incompatibilidad con el resultado e invención de hechos.
-Una respuesta inválida se regenera una vez; si sigue fallando no se consume turno.
+Una respuesta inválida se regenera una vez; si sigue fallando el diálogo se usa
+una réplica de guion acorde a la decisión de Jev, sin aceptar texto rechazado.
+Solo si falla la evaluación no se consume turno: no se inventan probabilidades.
 Todo esto es probabilístico y requiere evaluación editorial: no garantiza buen
 humor, balance perfecto ni ausencia de fallos. El final visual usa únicamente el
 `status: won` confirmado, sin nuevas llamadas a Jev ni OpenAI.

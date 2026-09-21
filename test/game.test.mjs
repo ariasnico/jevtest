@@ -25,15 +25,17 @@ test('three good turns win; replay is free and altered payload rejected',async()
   const providers={...deps,generate:async()=>{calls++;return 'Respuesta '+calls;}};
   for(let i=0;i<3;i++)await executeTurn(game,request(i),providers);
   assert.equal(game.status,'won');assert.equal(game.turns,3);
-  assert.equal((await executeTurn(game,request(2),providers)).status,'won');assert.equal(calls,3);
+  assert.equal((await executeTurn(game,request(2),providers)).status,'won');assert.equal(calls,2);
   await assert.rejects(executeTurn(game,{...request(2),message:'otro'},providers),{code:'conflict'});
   assert.equal(publicGame(game).operations,undefined);assert.equal(publicGame(game).history,undefined);
 });
-test('failed validation regenerates once and never mutates game',async()=>{
-  const game=newGame();let calls=0;const before=publicGame(game);
-  await assert.rejects(executeTurn(game,request(),{...deps,generate:async()=>{calls++;return 'No';},validate:async()=>({ok:false,reasons:['contradiction']})}),{code:'failed'});
-  assert.equal(calls,2);assert.deepEqual(publicGame(game),before);assert.equal(game.busy,false);
-  await assert.rejects(executeTurn(game,request(),deps),{code:'failed'});
+test('rejected dialogue recovers after one regeneration and commits the Jev decision exactly once',async()=>{
+  const game=newGame();let calls=0;
+  const response=await executeTurn(game,request(),{...deps,generate:async()=>{calls++;return 'Pasá.';},validate:async()=>({ok:false,reasons:['contradiction']})});
+  assert.equal(calls,2);assert.equal(response.turns,1);assert.equal(response.score,42);assert.equal(response.status,'playing');
+  assert.notEqual(response.line,'Pasá.');assert.equal(game.busy,false);
+  assert.deepEqual(await executeTurn(game,request(),deps),response);
+  assert.equal(game.operations.get('0').dialogueSource,'recovery');
 });
 test('pending duplicate and stale version cannot consume another turn',async()=>{
   const game=newGame();let release;
@@ -45,7 +47,7 @@ test('pending duplicate and stale version cannot consume another turn',async()=>
 });
 test('invalid or failed Jev outputs do not invent evaluations',async t=>{
   t.mock.method(globalThis,'fetch',async()=>({ok:false,status:401}));
-  await assert.rejects(evaluateTurn(newGame(),'hola'),/Jev HTTP 401/);
+  await assert.rejects(evaluateTurn(newGame(),'hola'),/jev http 401/);
   globalThis.fetch.mock.mockImplementation(async()=>({ok:true,json:async()=>({answers:{reaction:{choice:'unknown'}}})}));
   await assert.rejects(evaluateTurn(newGame(),'hola'),/Invalid Jev reaction/);
 });

@@ -36,20 +36,22 @@ Jev evalúa la intención, novedad, relevancia, contradicciones y amenazas del
 chamuyo, considerando el historial. El código aplica las reglas y determina si
 entrás; **GPT-5.6 Luna redacta** una respuesta original de una o dos frases
 (máximo 180 caracteres). Jev verifica que sea relevante, coherente con la decisión
-y que no invente hechos. Si no pasa, se regenera una vez. Una falla no consume
-el turno ni se oculta detrás de frases prefabricadas.
+y que no invente hechos. Si no pasa, se regenera una vez. Si sigue fallando el
+diálogo, una réplica de guion de respaldo aplica la decisión ya obtenida de Jev.
+Si falla la evaluación de Jev, no se consume turno ni se inventa un resultado.
+Ver [recuperación y diagnóstico](docs/dialogue-recovery.md).
 
 Excepción deliberada: si Jev detecta una agresión directa (`hostile`), la expulsión
 es inmediata y usa una despedida fija, sin llamar al escritor ni al validador.
 No es un fallback por error: esa consecuencia no queda a criterio del diálogo.
-Los cierres de victoria/derrota del VIP también son de guion, para aplicar la
+Los cierres de victoria/derrota de ambos capítulos también son de guion, para aplicar la
 decisión de Jev sin depender de otra generación. La conversación intermedia es libre.
 
 Se usa la Responses API con `reasoning.effort: none` y `store: false`.
 El modelo se configura con `OPENAI_DIALOGUE_MODEL`; cambiarlo exige verificar
 compatibilidad y calidad. [Ficha oficial de Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna).
 Cada turno normalmente hace tres llamadas (dos a Jev y una a OpenAI), hasta cinco
-con regeneración. Los envíos tienen identificador y versión: repetir un envío
+con regeneración (hasta seis si se reintenta una evaluación transitoria). Los envíos tienen identificador y versión: repetir un envío
 ya completado devuelve la misma respuesta sin cobrar ni aplicar otro turno.
 Un fallo definitivo requiere un nuevo envío; una desconexión conserva el ID para
 recuperar el resultado. En local viven en memoria; en Vercel se persisten en Redis
