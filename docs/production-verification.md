@@ -1,5 +1,9 @@
 # Verificación de la beta — 2026-09-20
 
+Nota posterior: el propietario autorizó quitar el tope diario. La prueba del
+corte de US$2 que se describe abajo corresponde a la versión inicial; ahora se
+verifica contabilidad concurrente por encima de ese importe sin bloquear llamadas.
+
 - Vercel: `https://caramelo-jev.vercel.app`, proyecto `caramelo-jev`.
 - 19 pruebas unitarias/HTTP y 10 de navegador aprobadas.
 - Redis real: reenvío persistente, conflictos, bloqueo entre workers, fallas y

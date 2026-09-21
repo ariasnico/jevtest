@@ -48,10 +48,10 @@ test('production API gates every model route, origin, host, login and input',asy
   assert.equal((await request('/api/start',{},{cookie})).status,503);assert.equal(starts,1);
   env.CARAMELO_ENABLED='0';assert.equal((await request('/api/start',{},{cookie})).status,503);
 });
-test('budget fails closed and restricts models and request sizes',async()=>{
+test('provider accounting fails closed and restricts models and request sizes',async()=>{
   const store=new ProductionStore({command:async()=>0});
   const meta={provider:'jev',payload:{model:'jev-latest',questions:{},state:{}}};
-  await assert.rejects(store.reserve(meta,{lock:'test',owner:'test'}),{code:'budget'});
+  await assert.rejects(store.reserve(meta,{lock:'test',owner:'test'}),{code:'unavailable'});
   await assert.rejects(store.reserve({...meta,payload:{...meta.payload,model:'other'}},{}),{code:'unavailable'});
   await assert.rejects(store.reserve({...meta,payload:{...meta.payload,state:'x'.repeat(12001)}},{}),{code:'unavailable'});
   const noRedis=new ProductionStore({url:'',token:''});

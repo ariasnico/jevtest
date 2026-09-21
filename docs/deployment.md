@@ -9,11 +9,12 @@ no se registran textos ni credenciales en los logs de la aplicación.
 
 ## Presupuesto y límites
 
-- US$2 **globales por día UTC** (reinicio 21:00 Argentina), persistidos en Redis.
-- Reserva conservadora **US$0,01 por llamada** antes de cada petición externa,
-  incluidos reintentos y validaciones; máximo 200 llamadas/día, usualmente 3–5
-  por turno. No se reembolsa una llamada fallida o de resultado incierto.
-- No es una lectura de la factura: puede cortar bastante antes del gasto real.
+- **Sin tope diario de gasto**, por autorización del propietario. Se retiró el
+  corte de US$2/día; no hace falta borrar el contador anterior ni esperar su reinicio.
+- Contabilidad conservadora de **US$0,01 por llamada** antes de cada petición externa,
+  incluidos reintentos y validaciones, usualmente 3–5 por turno. No se descuenta
+  una llamada fallida o de resultado incierto. El contador persiste en Redis.
+- No es una lectura de la factura ni un límite de gasto.
   Modelos restringidos a Jev y GPT-5.6 Luna; requests ≤12 KB, salida Luna ≤180
   tokens sin razonamiento. Revisar reservas al cambiar modelos o tarifas.
 - Referencias verificadas 2026-09-20: [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
@@ -28,7 +29,7 @@ no se registran textos ni credenciales en los logs de la aplicación.
   comparación de propietario; un reenvío recupera la respuesta sin gastar otra vez.
   Una operación interrumpida no se vuelve a ejecutar silenciosamente.
 
-El límite cubre únicamente llamadas de **esta app**: no usos externos de las mismas
+La contabilidad cubre únicamente llamadas de **esta app**: no usos externos de las mismas
 keys, cargos de hosting, impuestos ni cambios futuros de tarifas. Contraseña
 compartida + rate limiting no equivalen a protección absoluta contra bots/DDoS.
 Conviene usar claves dedicadas y configurar también topes en los proveedores.
@@ -50,8 +51,8 @@ al rotar credenciales. No habilitar producción en previews.
 
 `npm test`, `CHROME_PATH=/usr/bin/google-chrome npm run test:e2e`.
 `node --env-file=.env.production.local scripts/test-redis.mjs` comprueba concurrencia
-y corte con Redis real, namespace temporal separado, sin llamadas a modelos.
+y contabilidad sin tope con Redis real, namespace temporal separado, sin llamadas a modelos.
 `python3 scripts/check_secrets.py` revisa el índice de Git antes de publicar.
 
 Esta implementación reemplaza el plan previo SQLite: Vercel requiere estado y
-presupuesto compartidos entre invocaciones, no contadores en memoria/disco local.
+contabilidad compartidos entre invocaciones, no contadores en memoria/disco local.

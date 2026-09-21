@@ -25,8 +25,8 @@ Durante la conversación, las réplicas sí se generan y validan en cada turno.
 - `/api/resume` recupera estado público y última respuesta; nunca expone
   evaluaciones, operaciones internas ni secretos. No genera texto ni gasta APIs.
 - Nuevas rutas requieren la misma autenticación, origen, límites por IP y
-  presupuesto. No hay parámetro público para forzar capítulo, puntaje o victoria.
-- Presupuesto compartido de US$2/día sin cambios. Las imágenes son estáticas y
+  contabilidad de uso. No hay parámetro público para forzar capítulo, puntaje o victoria.
+- Sin tope diario de gasto en producción, por decisión del propietario. Las imágenes son estáticas y
   se generan una vez, nunca con cada partida.
 
 ## Arte y referencias

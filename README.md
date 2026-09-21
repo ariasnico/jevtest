@@ -89,8 +89,8 @@ El servidor desbloquea el VIP solo después de una victoria en la puerta. La
 transición es idempotente y mantiene versiones crecientes: doble clic o reintento
 no reinician el capítulo. Al recargar se recuperan el capítulo, puntos, turnos y
 última respuesta de la sesión; el historial visual se vacía, pero el servidor
-conserva el contexto. «Otra noche» reinicia desde el patova. El presupuesto de
-US$2/día sigue siendo compartido entre los dos capítulos, no se duplica.
+conserva el contexto. «Otra noche» reinicia desde el patova. Ambos capítulos
+comparten un contador de uso, sin tope diario de gasto en producción.
 
 La interfaz está pensada primero para celular: escena vertical, personajes en
 primer plano, controles táctiles y cuadro de texto dentro de la ilustración.
@@ -136,7 +136,7 @@ Hay un límite global local de 100 llamadas a proveedores por hora, cuerpo de pe
 validación de origen y sesiones con cookies HttpOnly/SameSite. Antes de alojarlo
 en internet no uses el servidor local por un túnel público con una clave personal.
 La versión Vercel agrega contraseña hasheada, cookies firmadas, límites por IP y
-presupuesto global persistente de US$2/día con reservas conservadoras.
+contabilidad persistente de llamadas, sin corte por gasto diario.
 Ver [despliegue, límites y operación](docs/deployment.md).
 
 ## Desarrollo
