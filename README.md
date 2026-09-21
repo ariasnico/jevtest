@@ -35,6 +35,10 @@ entrás; **GPT-5.6 Luna redacta** una respuesta original de una o dos frases
 y que no invente hechos. Si no pasa, se regenera una vez. Una falla no consume
 el turno ni se oculta detrás de frases prefabricadas.
 
+Excepción deliberada: si Jev detecta una agresión directa (`hostile`), la expulsión
+es inmediata y usa una despedida fija, sin llamar al escritor ni al validador.
+No es un fallback por error: esa consecuencia no queda a criterio del diálogo.
+
 Se usa la Responses API con `reasoning.effort: none` y `store: false`.
 El modelo se configura con `OPENAI_DIALOGUE_MODEL`; cambiarlo exige verificar
 compatibilidad y calidad. [Ficha oficial de Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna).

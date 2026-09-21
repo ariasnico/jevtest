@@ -9,13 +9,16 @@ const request=(n=0)=>({turnId:String(n),expectedVersion:n,message:'Una razón nu
 test('an insult produces a terminal refusal and later apologies cannot reopen the game',async()=>{
   const game=newGame();let calls=0;
   const providers={...deps,evaluate:async()=>({...evaluation,reaction:'hostile',threat:0}),
-    generate:async({decision})=>{calls++;assert.equal(decision.status,'lost');assert.equal(decision.action,'refuse');return 'Con ese trato no entrás. Se terminó la charla.';}};
+    generate:async()=>{calls++;throw Error('Writer must not run after expulsion');},
+    validate:async()=>{calls++;throw Error('Validator must not run after expulsion');}};
   const insult={...request(),message:'alta cara de boludo tenes'};
   const response=await executeTurn(game,insult,providers);
   assert.equal(response.status,'lost');assert.equal(response.turns,1);
+  assert.equal(response.line,'Con ese trato no entrás. Se terminó la charla.');
+  assert.equal(game.action,'refuse');
   assert.deepEqual(await executeTurn(game,insult,providers),response);
   await assert.rejects(executeTurn(game,{...request(1),message:'Perdón, era un chiste.'},providers),{code:'finished'});
-  assert.equal(calls,1);
+  assert.equal(calls,0);
 });
 test('three good turns win; replay is free and altered payload rejected',async()=>{
   const game=newGame();let calls=0;
