@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-const invitation = 'Vení, tenemos lugar en la mesa. Después te sacamos a bailar.';
+const invitation = 'Vení, lindo. Te guardamos lugar… pero portarte bien es opcional.';
 const initial = { turns: 0, maxTurns: 6, score: 12, version: 0, status: 'playing', mood: 'Cara de póker', line: 'Dame una buena razón.' };
 async function win(page) {
   await page.route('**/api/start', route => route.fulfill({ json: initial }));
