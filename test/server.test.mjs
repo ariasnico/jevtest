@@ -36,6 +36,8 @@ test('HTTP boundaries protect private files, session state, origin and input', a
   assert.equal(body.score, 12);
   assert.equal(body.history, undefined);
   const session = { Cookie: cookie.split(';')[0] };
+  assert.equal((await request('/api/continue',{expectedVersion:0},session)).status,403);
+  assert.equal((await (await request('/api/resume',{},session)).json()).game.chapter,'door');
   assert.equal((await request('/api/talk', null, session)).status, 400);
   for (const message of ['', 'x'.repeat(281), 123]) assert.equal((await request('/api/talk', { message }, session)).status, 400);
   const root = await request('/');

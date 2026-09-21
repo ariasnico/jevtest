@@ -21,6 +21,8 @@
         <button id="sound" class="quiet" aria-label="Activar sonido" aria-pressed="false">♪ SONIDO OFF</button>
       </div>
     </header>
+    <div class="chapter-heading"><span id="chapter-label">01 / LA PUERTA</span><span id="chapter-goal">CONVENCÉ AL PATOVA</span></div>
+    <p id="chapter-note" hidden>Clavicular: personaje ficticio / parodia. Sin afiliación ni respaldo del influencer.</p>
     <section class="game" aria-label="Convencé al patova para entrar a Caramelo">
       <div class="scene" id="scene" role="group" aria-label="En la puerta de Caramelo">
         <img class="scene-art" src="/assets/caramelo-door.png" alt="Arte ASCII detallado: vos, a la izquierda, mirás hacia arriba al enorme patova de brazos cruzados. Detrás brilla el cartel de Caramelo." fetchpriority="high" decoding="async" width="1086" height="1448">
@@ -51,10 +53,12 @@
             <p id="cinematic-caption" role="status"></p>
             <div id="cinematic-outcome" hidden><h2>De la vereda a la pista.</h2><p>Entraste con puro chamuyo.</p></div>
             <div class="cinematic-actions">
+              <button id="continue" class="primary" hidden>CONTINUAR · EL VIP ↗</button>
               <button id="ending-pause" class="quiet" aria-pressed="false" hidden>Pausar</button>
               <button id="ending-skip" class="quiet" hidden>Saltar</button>
               <button id="ending-restart" class="primary">Otra noche ↗</button>
             </div>
+            <p id="continue-error" role="alert" hidden></p>
           </div>
         </div>
       <div class="console">
@@ -72,6 +76,7 @@
         <p id="error" role="alert" hidden></p>
         <button id="retry" class="quiet" hidden>REINTENTAR CONEXIÓN ↗</button>
       </div>
+      <p id="art-error" class="art-error" role="status" hidden>El arte no pudo cargar. Podés seguir jugando igual.</p>
       </div>
       <details id="history"><summary>LO QUE DIJISTE <span aria-hidden="true">+</span></summary><ol id="messages"></ol></details>
     </section>

@@ -32,6 +32,8 @@ test('production API gates every model route, origin, host, login and input',asy
   }
   assert.equal((await request('/api/start')).status,401);
   assert.equal((await request('/api/talk')).status,401);
+  assert.equal((await request('/api/continue',{expectedVersion:0})).status,401);
+  assert.equal((await request('/api/resume')).status,401);
   assert.equal((await request('/api/index')).status,404);
   assert.equal((await request('/api/login',{password:'test-invitation'},{origin:'https://evil.example'})).status,403);
   assert.equal((await request('/api/login',{password:'test-invitation'},{host:'evil.example'})).status,403);

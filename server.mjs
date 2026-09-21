@@ -2,7 +2,7 @@ import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { newGame, publicGame } from './game.mjs';
+import { newGame, publicGame, advanceGame } from './game.mjs';
 import { executeTurn, TurnError } from './lib/turns.mjs';
 import { endingFrames } from './public/ending-state.js';
 
@@ -22,6 +22,7 @@ const assets = new Map([
   ['/ending.js', ['ending.js', 'text/javascript; charset=utf-8']],
   ['/ending-state.js', ['ending-state.js', 'text/javascript; charset=utf-8']],
   ...endingFrames.map(({ src }) => [src, [src.slice(1), 'image/webp']]),
+  ...['clavicular-vip','vip-table'].map(name=>[`/assets/vip/${name}.webp`,[`assets/vip/${name}.webp`,'image/webp']]),
   ['/assets/caramelo-door.png', ['assets/caramelo-door.png', 'image/png']]
 ]);
 const headers = {
@@ -53,7 +54,7 @@ export const server = http.createServer(async (req, res) => {
       res.writeHead(200, { ...headers, 'Content-Type': type });
       return res.end(body);
     }
-    if (req.method !== 'POST' || !['/api/start', '/api/talk'].includes(path)) return json(res, 404, { error: 'No encontrado.' });
+    if (req.method !== 'POST' || !['/api/start', '/api/talk','/api/continue','/api/resume'].includes(path)) return json(res, 404, { error: 'No encontrado.' });
     if (req.headers.origin !== `http://${req.headers.host}` || req.headers['content-type']?.split(';')[0] !== 'application/json') return json(res, 403, { error: 'Origen no permitido.' });
     if (!process.env.JEV_API_KEY) return json(res, 503, { error: 'Falta configurar JEV_API_KEY en el .env del servidor.' });
     if (!process.env.OPENAI_API_KEY) return json(res, 503, { error: 'Falta configurar OPENAI_API_KEY en el .env del servidor.' });
@@ -70,9 +71,15 @@ export const server = http.createServer(async (req, res) => {
     }
     const id = req.headers.cookie?.match(/(?:^|;\s*)caramelo=([a-f0-9]{48})(?:;|$)/)?.[1];
     const game = sessions.get(id);
+    if(path==='/api/resume')return json(res,200,{game:game?publicGame(game):null});
     if (!game) return json(res, 401, { error: 'La noche terminó. Empezá una nueva partida.' });
     let body;
     try { body = await readBody(req); } catch { return json(res, 400, { error: 'Mensaje inválido.' }); }
+    if(path==='/api/continue') {
+      if(!Number.isSafeInteger(body?.expectedVersion)||body.expectedVersion<0)return json(res,400,{error:'Versión inválida.'});
+      try {const next=advanceGame(game,body.expectedVersion);sessions.set(id,next);return json(res,200,publicGame(next));}
+      catch(error){return json(res,error.status||500,{error:error.message,code:error.code});}
+    }
     const message = typeof body?.message === 'string' ? body.message.trim() : '';
     if (!message || message.length > 280) return json(res, 400, { error: 'Escribí entre 1 y 280 caracteres.' });
     if (!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.turnId) || !Number.isSafeInteger(body.expectedVersion) || body.expectedVersion < 0) return json(res, 400, { error: 'Identificador de turno inválido.' });

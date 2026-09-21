@@ -26,7 +26,7 @@ for (const width of [320, 390, 768]) {
     await expect(page.getByText(invitation)).toBeVisible();
     await expect(page.locator('#ending-art')).toHaveAttribute('src', /06-table/);
     expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
-    expect(calls.length).toBe(2); // Playback makes no API calls.
+    expect(calls.length).toBe(3); // Resume + start + talk; playback makes no API calls.
     await page.screenshot({ path: `test-results/ending-${width}.png` });
     await page.locator('#ending-restart').click();
     await expect(page.locator('#scene')).toHaveAttribute('data-ending-state', 'door');

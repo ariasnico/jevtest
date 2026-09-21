@@ -9,7 +9,38 @@ let game;
 let busy = true;
 let audio;
 let sound = false;
-const ending = createEnding({ scene: $('#scene'), onRestart: start });
+const ending = createEnding({ scene: $('#scene'), onRestart: start, onContinue: continueChapter });
+const isVip=()=>game?.chapter==='vip';
+function chapterUI() {
+  const chapter=isVip()?'vip':'door';
+  ending.setChapter(chapter);
+  if($('#scene').dataset.chapter===chapter)return;
+  $('#scene').dataset.chapter=chapter;
+  const character=isVip()?'Clavicular':'el patova';
+  $('#guard-bubble .speaker').textContent=isVip()?'CLAVICULAR':'EL PATOVA';
+  $('#chapter-label').textContent=isVip()?'02 / LA MESA VIP':'01 / LA PUERTA';
+  $('#chapter-goal').textContent=isVip()?'GANATE UN LUGAR':'CONVENCÉ AL PATOVA';
+  $('#chapter-note').hidden=!isVip();
+  $('.time').textContent=isVip()?'/ 03:12 AM':'/ 02:47 AM';
+  $('#scene').setAttribute('aria-label',isVip()?'El VIP de Caramelo, con Clavicular':'En la puerta de Caramelo');
+  $('.game').setAttribute('aria-label',isVip()?'Hacete amigo de Clavicular y ganate un lugar en su mesa VIP':'Convencé al patova para entrar a Caramelo');
+  $('h1').textContent=isVip()?'Caramelo. La mesa VIP de Clavicular.':'Caramelo. Convencé al patova.';
+  document.title=isVip()?'Caramelo — La mesa VIP':'Caramelo — ¿Estás en la lista?';
+  $('label[for="message"]').textContent=`¿Qué le decís a ${character}?`.replace('a el','al');
+  $('#send').setAttribute('aria-label',`Enviar mensaje a ${character}`.replace('a el','al'));
+  $('label[for="trust"]').textContent=isVip()?'Afinidad con Clavicular':'Buena onda del patova';
+  $('#message').placeholder=isVip()?'Mostrá qué onda traés…':'Tirá tu mejor chamuyo…';
+  $('#hint').textContent=isVip()?'Seis intentos. Caele bien, no lo adules.':'Seis intentos. Convencelo.';
+  const art=$('.scene-art');
+  const src=isVip()?'/assets/vip/clavicular-vip.webp':'/assets/caramelo-door.png';
+  art.alt=isVip()?'Parodia ficticia en ASCII: Clavicular frente a vos en el VIP, acompañado de cinco invitadas adultas con vestidos de fiesta.':'Arte ASCII: vos frente al patova en la puerta de Caramelo.';
+  if(art.getAttribute('src')!==src){$('#art-error').hidden=true;art.src=src;}
+}
+function clearConversation() {
+  pendingTurn=undefined;$('#messages').replaceChildren();$('#player-bubble').hidden=true;
+  $('#player-line').textContent='';$('#message').value='';$('#count').textContent='0 / 280';$('#history').open=false;
+  $('#error').hidden=true;$('#retry').hidden=true;
+}
 
 function blip(won = false) {
   if (!sound || !audio) return;
@@ -34,9 +65,11 @@ function controls() {
   $('#again').disabled = busy;
   $('#enter').disabled = busy;
   $('#ending-restart').disabled = busy;
+  $('#continue').disabled=busy;
   $('#form').setAttribute('aria-busy', String(busy));
 }
 function render() {
+  chapterUI();
   $('#guard-line').textContent = game.line;
   $('#guard-line').scrollTop = 0;
   $('#guard-bubble').dataset.pending = 'false';
@@ -50,10 +83,11 @@ function render() {
     const won = game.status === 'won';
     $('#enter').hidden = !won;
     $('#again').hidden = won;
+    $('#enter').textContent=isVip()?'Sentarme en la mesa':'Entrar';
     if (won) ending.admit();
-    $('#ending-kicker').textContent = won ? 'LA SOGA SE CORRIÓ. LA NOCHE ES TUYA.' : 'FIN DE LA NOCHE · SEGUÍS EN LA VEREDA';
-    $('#ending-title').textContent = won ? 'Bienvenido a Caramelo.' : 'Hoy no, maestro.';
-    $('#ending-copy').textContent = won ? `Lo lograste en ${game.turns} intentos. Sin lista, sin contactos. Puro chamuyo.` : 'El after en la vereda también tiene lo suyo. Respirá, inventá otra historia y volvé a intentarlo.';
+    $('#ending-kicker').textContent = isVip()?(won?'NO FUE TU PERFIL. FUE TU ONDA.':'FIN DEL CAPÍTULO · EL VIP NO SE DIO'):won ? 'LA SOGA SE CORRIÓ. LA NOCHE ES TUYA.' : 'FIN DE LA NOCHE · SEGUÍS EN LA VEREDA';
+    $('#ending-title').textContent = isVip()?(won?'Hay lugar para vos.':'Nos vemos en la pista.'):won ? 'Bienvenido a Caramelo.' : 'Hoy no, maestro.';
+    $('#ending-copy').textContent = isVip()?(won?`Te ganaste un lugar en ${game.turns} intentos. La noche sigue con el grupo.`:'Seguís adentro de Caramelo, pero esta mesa no se abrió. Otra noche, otra historia.'):won ? `Lo lograste en ${game.turns} intentos. Sin lista, sin contactos. Puro chamuyo.` : 'El after en la vereda también tiene lo suyo. Respirá, inventá otra historia y volvé a intentarlo.';
     $('#hint').textContent = won ? 'Objetivo cumplido. Ya podés presumir.' : 'Cada noche es una nueva oportunidad.';
     (won ? $('#enter') : $('#again')).focus({ preventScroll: true });
   }
@@ -65,7 +99,7 @@ async function request(path, body) {
   if (!response.ok) {
     if (data.code === 'auth_required') location.replace('/login.html');
     if (response.status === 401 || ['stale', 'limit'].includes(data.code)) $('#retry').hidden = false;
-    const error = new Error(data.error || 'No pudimos hablar con el patova.');
+    const error = new Error(data.error || 'No pudimos continuar la charla.');
     error.code = data.code;
     throw error;
   }
@@ -84,18 +118,36 @@ async function start() {
   $('#retry').hidden = true;
   try {
     game = await request('/api/start', {});
-    pendingTurn = undefined;
-    $('#messages').replaceChildren();
-    $('#player-bubble').hidden = true;
-    $('#player-line').textContent = '';
-    $('#message').value = '';
-    $('#count').textContent = '0 / 280';
+    clearConversation();
     $('#hint').textContent = 'Seis intentos. Convencelo.';
-    $('#history').open = false;
     busy = false;
     render();
   } catch (error) { showError(error); $('#retry').hidden = false; }
   finally { busy = false; controls(); }
+}
+async function restore() {
+  if(busy&&game)return;
+  busy=true;controls();
+  try {
+    const data=await request('/api/resume',{});
+    if(!data.game){busy=false;return await start();}
+    ending.reset();game=data.game;clearConversation();busy=false;render();
+  }catch(error){showError(error);$('#retry').hidden=false;}
+  finally{busy=false;controls();}
+}
+async function continueChapter(event) {
+  if(busy||!game||game.status!=='won'||isVip())return;
+  busy=true;controls();$('#continue-error').hidden=true;
+  try{
+    const next=await request('/api/continue',{expectedVersion:game.version});
+    ending.reset();game=next;clearConversation();busy=false;render();
+    // Rare chapter transition: state indication, 200ms opacity-only. Keyboard
+    // actions and reduced-motion preferences switch instantly.
+    if(event?.detail>0&&!matchMedia('(prefers-reduced-motion: reduce)').matches)
+      $('#scene').animate([{opacity:.3},{opacity:1}],{duration:200,easing:'cubic-bezier(0.23, 1, 0.32, 1)'});
+    $('#guard-line').focus({preventScroll:true});
+  }catch(error){$('#continue-error').textContent=error.message;$('#continue-error').hidden=false;}
+  finally{busy=false;controls();}
 }
 function historyEntry(who, text) {
   const li = document.createElement('li');
@@ -123,12 +175,12 @@ $('#form').addEventListener('submit', async event => {
   $('#player-line').scrollTop = 0;
   $('#player-bubble').hidden = false;
   $('#guard-bubble').dataset.pending = 'true';
-  $('#guard-line').textContent = 'Te mira de arriba abajo. Está pensando…';
+  $('#guard-line').textContent = isVip()?'Te escucha por encima de la música…':'Te mira de arriba abajo. Está pensando…';
   try {
     game = await request('/api/talk', pendingTurn);
     pendingTurn = undefined;
     historyEntry('VOS', message);
-    historyEntry('EL PATOVA', game.line);
+    historyEntry(isVip()?'CLAVICULAR':'EL PATOVA', game.line);
     if ($('#message').value.trim() === message) {
       $('#message').value = '';
       $('#count').textContent = '0 / 280';
@@ -154,7 +206,7 @@ $('#message').addEventListener('keydown', event => {
   }
 });
 $('#again').addEventListener('click', start);
-$('#retry').addEventListener('click', start);
+$('#retry').addEventListener('click', restore);
 $('#sound').addEventListener('click', async () => {
   try {
     audio ??= new AudioContext();
@@ -166,5 +218,7 @@ $('#sound').addEventListener('click', async () => {
     blip();
   } catch { $('#sound').textContent = 'SONIDO NO DISPONIBLE'; }
 });
-start();
+$('.scene-art').addEventListener('error',()=>{$('#art-error').hidden=false;});
+$('.scene-art').addEventListener('load',()=>{$('#art-error').hidden=true;});
+restore();
 initMotion();

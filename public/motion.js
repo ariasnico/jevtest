@@ -15,6 +15,7 @@ uniform sampler2D picture;
 uniform float time;
 uniform vec2 crop;
 uniform vec2 offset;
+uniform float vip;
 
 float region(vec2 point, vec2 center, vec2 radius) {
   vec2 distance = (point - center) / radius;
@@ -25,8 +26,8 @@ void main() {
   vec2 uv = coord * crop + offset;
   vec2 source = uv;
   // Separate, softly bounded fields keep the building still and avoid cutouts.
-  float chest = region(uv, vec2(.74, .49), vec2(.32, .25));
-  float head = region(uv, vec2(.72, .235), vec2(.13, .13));
+  float chest = region(uv, mix(vec2(.74, .49),vec2(.59,.50),vip), vec2(.32, .25));
+  float head = region(uv, mix(vec2(.72, .235),vec2(.54,.29),vip), vec2(.13, .13));
   float visitor = region(uv, vec2(.245, .65), vec2(.22, .31));
   float breath = sin(time * 1.57);
   float weight = sin(time * .71 + 1.2);
@@ -67,7 +68,10 @@ export async function initMotion() {
   let sizeObserver;
   let viewObserver;
   let endObserver;
+  let sourceObserver;
   let uniforms;
+  let loadingImage=false;
+  let imageRevision=0;
 
   function cleanup() {
     clearInterval(timer);
@@ -78,6 +82,7 @@ export async function initMotion() {
     sizeObserver?.disconnect();
     viewObserver?.disconnect();
     endObserver?.disconnect();
+    sourceObserver?.disconnect();
     if (gl && !gl.isContextLost()) {
       gl.deleteTexture(texture);
       gl.deleteBuffer(buffer);
@@ -107,6 +112,7 @@ export async function initMotion() {
     gl.uniform2f(uniforms.crop, cropX, cropY);
     gl.uniform2f(uniforms.offset, (1 - cropX) / 2, 0);
     gl.uniform1f(uniforms.time, elapsed);
+    gl.uniform1f(uniforms.vip,scene.dataset.chapter==='vip'?1:0);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     canvas.dataset.frame = String(frame++);
   }
@@ -129,7 +135,7 @@ export async function initMotion() {
     const cinematic = !['door', 'admitted', undefined].includes(scene.dataset.endingState);
     button.hidden = cinematic;
     if (cinematic) canvas.hidden = true;
-    const running = active && !cinematic && inView && !document.hidden && document.querySelector('#ending').hidden;
+    const running = active && !loadingImage && !cinematic && inView && !document.hidden && document.querySelector('#ending').hidden;
     canvas.dataset.running = String(running);
     if (!running) return;
     draw();
@@ -175,7 +181,7 @@ export async function initMotion() {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    uniforms = Object.fromEntries(['crop', 'offset', 'time'].map(key => [key, gl.getUniformLocation(program, key)]));
+    uniforms = Object.fromEntries(['crop', 'offset', 'time','vip'].map(key => [key, gl.getUniformLocation(program, key)]));
     gl.uniform1i(gl.getUniformLocation(program, 'picture'), 0);
     if (gl.getError() !== gl.NO_ERROR) throw new Error('Animation setup failed');
     button.hidden = false;
@@ -192,6 +198,17 @@ export async function initMotion() {
     endObserver = new MutationObserver(sync);
     endObserver.observe(document.querySelector('#ending'), { attributes: true, attributeFilter: ['hidden'] });
     endObserver.observe(scene, { attributes: true, attributeFilter: ['data-ending-state'] });
+    sourceObserver=new MutationObserver(async()=>{
+      const revision=++imageRevision;loadingImage=true;canvas.hidden=true;sync();
+      try {
+        await image.decode();
+        if(revision!==imageRevision||failed)return;
+        gl.bindTexture(gl.TEXTURE_2D,texture);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,image);
+        elapsed=0;loadingImage=false;sync();
+      }catch {if(revision===imageRevision){canvas.hidden=true;}}
+    });
+    sourceObserver.observe(image,{attributes:true,attributeFilter:['src']});
     sync();
   } catch {
     // WebGL/image decoding is optional: the complete static game remains usable.

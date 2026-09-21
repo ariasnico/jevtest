@@ -15,3 +15,7 @@ export const endingFrames = [
   { src: '/assets/ending/05-invite.webp', holdFrames: 9, phase: 'inside', caption: 'Parece que la noche recién empieza.' },
   { src: '/assets/ending/06-table.webp', holdFrames: 9, phase: 'inside', caption: 'Y ya tenés con quién compartirla.' }
 ];
+export const vipEndingFrames = [
+  {src:'/assets/vip/clavicular-vip.webp',holdFrames:6,phase:'entering',caption:'Se corre y te hace lugar.'},
+  {src:'/assets/vip/vip-table.webp',holdFrames:18,phase:'inside',caption:'Esta vez, la mesa también es tuya.'}
+];

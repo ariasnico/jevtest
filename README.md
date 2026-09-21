@@ -4,6 +4,10 @@
 
 Un pequeño juego de chamuyo en ASCII. Estás en la puerta del boliche Caramelo,
 no figurás en la lista y tenés seis intentos para convencer al patova.
+Si lo lográs, la noche sigue: **Continuar · El VIP** abre un segundo capítulo
+con una parodia ficticia de Clavicular. Seis intentos nuevos para caerle bien,
+aportar un plan al grupo y ganarte un lugar en su mesa. Hay dos ilustraciones
+ASCII nuevas, diálogo contextual, movimiento a 6 FPS y un final propio.
 Hecho con JavaScript, caracteres y decisiones de [Jev](https://typesafe.ai).
 
 **Beta para amigos:** [caramelo-jev.vercel.app](https://caramelo-jev.vercel.app).
@@ -38,6 +42,8 @@ el turno ni se oculta detrás de frases prefabricadas.
 Excepción deliberada: si Jev detecta una agresión directa (`hostile`), la expulsión
 es inmediata y usa una despedida fija, sin llamar al escritor ni al validador.
 No es un fallback por error: esa consecuencia no queda a criterio del diálogo.
+Los cierres de victoria/derrota del VIP también son de guion, para aplicar la
+decisión de Jev sin depender de otra generación. La conversación intermedia es libre.
 
 Se usa la Responses API con `reasoning.effort: none` y `store: false`.
 El modelo se configura con `OPENAI_DIALOGUE_MODEL`; cambiarlo exige verificar
@@ -75,6 +81,16 @@ salir de pantalla pausan el reloj; movimiento reducido muestra el final estátic
 Los recursos se precargan al ganar (menos de 5 MB), sin llamadas a modelos durante
 el final. Si una imagen falla, se conserva la victoria y el reinicio.
 Los [prompts exactos y archivos del final](docs/art-ending.md) quedan documentados.
+Los [prompts, referencias y reglas del capítulo VIP](docs/chapter-vip.md) también.
+Clavicular aparece como personaje ficticio, sin afiliación ni respaldo del influencer;
+todos los invitados son adultos. No se atribuyen al influencer real los diálogos del juego.
+
+El servidor desbloquea el VIP solo después de una victoria en la puerta. La
+transición es idempotente y mantiene versiones crecientes: doble clic o reintento
+no reinician el capítulo. Al recargar se recuperan el capítulo, puntos, turnos y
+última respuesta de la sesión; el historial visual se vacía, pero el servidor
+conserva el contexto. «Otra noche» reinicia desde el patova. El presupuesto de
+US$2/día sigue siendo compartido entre los dos capítulos, no se duplica.
 
 La interfaz está pensada primero para celular: escena vertical, personajes en
 primer plano, controles táctiles y cuadro de texto dentro de la ilustración.

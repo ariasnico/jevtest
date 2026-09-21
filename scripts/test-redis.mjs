@@ -9,6 +9,8 @@ const evaluation={reaction:'convincing',confidence:.99,novelty:.99,relevance:.99
 let calls=0;
 const deps={evaluate:async()=>{calls++;return evaluation;},generate:async()=> 'Buen punto. ¿Qué más me contás?',validate:async()=>({ok:true})};
 await store.start(id);
+await assert.rejects(store.continue(id,0),{code:'chapter_locked'});
+assert.equal((await store.resume(id)).chapter,'door');
 const request={turnId:randomUUID(),expectedVersion:0,message:'Vengo a festejar mi primer sueldo.'};
 const response=await store.talk(id,request,deps);
 assert.equal(response.turns,1);
@@ -44,4 +46,16 @@ await store.locked(id,async lease=>{
 });
 await store.rate('test',1,10);
 await assert.rejects(store.rate('test',1,10),{code:'rate'});
+// Win with deterministic test providers, then transition concurrently. Never
+// seed or mutate a real player's game or the production budget namespace.
+await store.start(id);
+for(let i=0;i<3;i++)await store.talk(id,{turnId:randomUUID(),expectedVersion:i,message:`Fresh reason ${i}`},deps);
+const transitions=await Promise.allSettled([store.continue(id,3),store.continue(id,3)]);
+assert.ok(transitions.some(r=>r.status==='fulfilled'));
+assert.equal((await store.resume(id)).chapter,'vip');
+assert.equal((await store.resume(id)).version,4);
+assert.equal((await store.continue(id,3)).version,4);
+await store.talk(id,{turnId:randomUUID(),expectedVersion:4,message:'A plan for the group'},deps);
+assert.equal((await store.continue(id,3)).turns,1);
+assert.equal((await store.resume(id)).version,5);
 console.log('Redis integration passed: persistent replay, locks, atomic budget race, restart persistence, rate limit. No AI calls.');
