@@ -47,7 +47,9 @@ con bloqueo distribuido para evitar turnos/cobros duplicados.
 
 El medidor muestra puntos del juego, **no probabilidades del modelo**. Arrancás
 con 12 y necesitás 80 en seis intentos. Llegar a cero no termina la charla;
-una amenaza seria detectada con alta confianza sí. La incertidumbre no suma puntos.
+un insulto directo o agresión al patova clasificado por Jev como `hostile` sí,
+igual que una amenaza seria detectada con alta confianza. No se bloquean palabras
+aisladas: Jev distingue agresión, citas y lunfardo amistoso. La incertidumbre no suma puntos.
 La escena es una imagen de alta densidad visual ASCII, generada con GPT Image
 a partir de un sketch del usuario. El juego usa el archivo incluido en el repo;
 no genera imágenes durante la partida. El [prompt del arte](docs/art-direction.md)

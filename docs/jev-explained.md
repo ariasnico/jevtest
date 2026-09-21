@@ -15,6 +15,13 @@ En `lib/evaluation.mjs`, `reaction` es Choice con nueve opciones:
 Las preguntas Noul separadas consultan si el mensaje aporta algo nuevo,
 es pertinente, contradice al jugador o contiene una amenaza seria.
 
+La categoría `hostile` cierra la partida inmediatamente: un insulto directo al
+patova no se compensa con puntos previos ni se acepta por presentarlo como un
+chiste. El código fija `status: "lost"` y `action: "refuse"`; el modelo de diálogo
+debe comunicar ese rechazo. Jev distingue agresión real de citas o lunfardo
+amistoso; no hay una lista de palabras prohibidas. Una disculpa posterior no
+reabre esa partida.
+
 ## Respuesta real
 
 Extracto completo de `answers` obtenido el 20/09/2026 con la integración actual,
