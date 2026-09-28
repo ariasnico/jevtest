@@ -14,7 +14,7 @@ test('VIP is locked before victory; transition is versioned, isolated and idempo
   assert.throws(()=>advanceGame(won,2),{code:'stale'});
   const vip=advanceGame(won,3);
   assert.equal(vip.chapter,'vip');assert.equal(vip.version,4);assert.equal(vip.turns,0);
-  assert.equal(vip.score,12);assert.equal(vip.status,'playing');assert.equal(vip.line,VIP_INTRO);
+  assert.equal(vip.score,30);assert.equal(vip.status,'playing');assert.equal(vip.line,VIP_INTRO);
   assert.deepEqual(vip.history,[]);assert.equal(vip.operations.size,0);assert.equal(won.history.length,1);
   vip.version++;vip.turns++;
   assert.equal(advanceGame(vip,3),vip);assert.equal(vip.turns,1);
@@ -26,8 +26,8 @@ test('VIP cannot consume an old chapter turn, and can win independently',async()
     assert.equal(chapter,'vip');return decision.status==='won'?'Sentate con nosotros.':'Buen plan, contame más.';
   },validate:async()=>({ok:true})};
   await assert.rejects(executeTurn(vip,{turnId:'old',expectedVersion:3,message:'Viejo'},deps),{code:'stale'});
-  for(let i=0;i<3;i++)await executeTurn(vip,{turnId:String(i),expectedVersion:4+i,message:'Plan '+i},deps);
-  assert.equal(vip.status,'won');assert.equal(vip.turns,3);assert.equal(vip.previousTurns,3);
+  await executeTurn(vip,{turnId:'0',expectedVersion:4,message:'Plan 0'},deps);
+  assert.equal(vip.status,'won');assert.equal(vip.turns,1);assert.equal(vip.previousTurns,3);
 });
 test('VIP hostility closes the table, not the nightclub, without calling writer',async()=>{
   const vip=advanceGame({...newGame(),status:'won'},0);

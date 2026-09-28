@@ -6,7 +6,8 @@ el jugador debe aportar humor, una historia honesta o un plan para el grupo.
 No se gana por apariencia, seguidores o dinero. Las invitadas son adultas y
 participantes de la noche, no recompensas ni personas reales identificadas.
 
-Seis turnos, 12 puntos iniciales, victoria a 80. Mismas reglas de repetición,
+Seis turnos, 30 puntos iniciales, victoria a 60 (más fácil que el patova: umbrales
+de novedad, relevancia y confianza más permisivos). Mismas reglas de repetición,
 incertidumbre y agresión; criterios y contexto de Jev específicos para amistad
 y acceso a la mesa, no para entrar nuevamente al edificio. Un insulto directo
 cierra el VIP. Perder no implica ser expulsado de Caramelo. El escritor recibe

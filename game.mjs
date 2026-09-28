@@ -2,6 +2,7 @@ export const INTRO = 'Buenas. Lista cerrada, casa llena. Dame una buena razón p
 export const MAX_TURNS = 6;
 export const VIP_INTRO = 'La mesa está llena de gente pidiendo selfies. ¿Vos qué traés a la noche?';
 import {TurnError} from './lib/turns.mjs';
+import {VIP_START_SCORE} from './lib/rules.mjs';
 export { publicGame } from './lib/turns.mjs';
 export function newGame() {
   return { chapter: 'door', turns: 0, version: 0, score: 12, status: 'playing', mood: 'Cara de póker', line: INTRO,
@@ -13,6 +14,6 @@ export function advanceGame(game,expectedVersion) {
   if(game.chapter==='vip')return game;
   if(game.status!=='won')throw new TurnError(403,'Primero tenés que convencer al patova.','chapter_locked');
   if(game.version!==expectedVersion)throw new TurnError(409,'La partida cambió. Recargá para recuperarla.','stale');
-  return {...newGame(),chapter:'vip',version:game.version+1,previousTurns:game.turns,
+  return {...newGame(),chapter:'vip',version:game.version+1,score:VIP_START_SCORE,previousTurns:game.turns,
     mood:'Te mide de arriba abajo',line:VIP_INTRO};
 }
